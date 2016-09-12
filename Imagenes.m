@@ -2,11 +2,10 @@ function Imagenes
 
 % Parameters definitions
 
-TOTAL_TRIALS = 3
-IMG_NUMBER = 3
-ZAPALLOFRAME = 8
-INTERVAL = 0.5
-TIMEOUT = 0.5
+TOTAL_TRIALS = 3;
+IMG_NUMBER = 3;
+INTERVAL = 0.5;
+TIMEOUT = 1.5;
 
 KbName('UnifyKeyNames');
 
@@ -52,11 +51,11 @@ try
   i = 1;
   escapeKey = KbName('ESCAPE');
   enterKey = KbName('SPACE');
-  time_samples = []
-  remaining_trials = TOTAL_TRIALS
+  time_samples = [];
+  remaining_trials = TOTAL_TRIALS;
 
-  KbQueueCreate()
-  KbQueueStart()
+  KbQueueCreate();
+  KbQueueStart();
 
   %%% THE TRIALS BEGIN %%%
 
@@ -77,20 +76,20 @@ try
     Screen('Flip', w);
 
     if i == IMG_NUMBER
-      remaining_trials = remaining_trials - 1
-      t_start = GetSecs()
-      WaitSecs(INTERVAL)
-      KbQueueStop()
+      remaining_trials = remaining_trials - 1;
+      t_start = GetSecs();
+      WaitSecs(INTERVAL);
+      % KbQueueStop()
       [ pressed, firstPress]=KbQueueCheck();
       %Asumo que solo se apreto una tecla en el trial y que es
       %enterkey
       if pressed
-        time_samples(TOTAL_TRIALS - remaining_trials) = firstPress(find(firstPress)) - t_start
+        time_samples(TOTAL_TRIALS - remaining_trials) = firstPress(find(firstPress)) - t_start;
       end
-      KbQueueFlush()
-      KbQueueStart()
+      KbQueueFlush();
+      % KbQueueStart()
     else
-      WaitSecs(INTERVAL)
+      WaitSecs(INTERVAL);
     end
 
     i = mod(i,IMG_NUMBER)+1;
@@ -102,32 +101,35 @@ try
   end
 
   % Show results on console
+  disp('')
+  disp('Showing samples obtained on this run:');
   disp(time_samples)
-  mean(time_samples)
-  var(time_samples)
+  disp('Showing mean obtained on this run:');
+  run_mean = mean(time_samples)
+  disp('Showing var obtained on this run:');
+  run_var = var(time_samples)
+
+  CleanupPTB(oldVisualDebugLevel, oldSupressAllWarnings);
+
+% This "catch" section executes in case of an error in the "try" section
+% above.  Importantly, it closes the onscreen window if it's open.
+catch
+  CleanupPTB(oldVisualDebugLevel, oldSupressAllWarnings);
+  psychrethrow(psychlasterror);
+end
+
+end % function
+
+function CleanupPTB (oldVisualDebugLevel, oldSupressAllWarnings)
 
   % The same command which closes onscreen and offscreen windows also
   % closes textures.
   Screen('CloseAll');
   ShowCursor;
   Priority(0);
-  KbQueueRelease()
 
   % Restore preferences
   Screen('Preference', 'VisualDebugLevel', oldVisualDebugLevel);
   Screen('Preference', 'SuppressAllWarnings', oldSupressAllWarnings);
 
-% This "catch" section executes in case of an error in the "try" section
-% above.  Importantly, it closes the onscreen window if it's open.
-catch
-
-  Screen('CloseAll');
-  ShowCursor;
-  Priority(0);
-
-  % Restore preferences
-  Screen('Preference', 'VisualDebugLevel', oldVisualDebugLevel);
-  Screen('Preference', 'SuppressAllWarnings', oldSupressAllWarnings);
-
-  psychrethrow(psychlasterror);
 end
