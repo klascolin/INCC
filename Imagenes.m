@@ -1,4 +1,4 @@
-function imagenes
+function Imagenes
 
 % Parameters definitions
 
