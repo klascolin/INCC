@@ -83,7 +83,7 @@ try
       [ pressed, firstPress]=KbQueueCheck();
        %Verifico que se haya presionad una tecla(la barra) y que haya sido solo una. Si no, el trial no es tenido en cuenta
       index_pressed = find(firstPress)
-      if pressed && length(index_pressed) == 1 && index_pressed == 66
+      if pressed && length(index_pressed) == 1  && firstPress(enterKey)
         remaining_trials = remaining_trials - 1;  
         time_samples(TOTAL_TRIALS - remaining_trials) = firstPress(find(firstPress)) - t_start;
       end
