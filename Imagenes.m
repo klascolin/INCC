@@ -10,7 +10,7 @@ function Imagenes
     IMG_NUMBER = 3;
     SND_NUMBER = 2;
 
-    % tiempo (regular) entre estÃ­mulos, en segundos
+    % tiempo (regular) entre estimulos, en segundos
     INTERVAL = 0.5;
 
     % diferencia entre img y sonido, en segundos
@@ -25,7 +25,7 @@ function Imagenes
     TARGET_IS_IMAGE = 1;
 
     % usar imagen / sonido
-    IMG = 0;
+    IMG = 1;
     SND = 1;
 
     if ~IMG && ~SND
@@ -33,11 +33,11 @@ function Imagenes
         quit
     end
     if TARGET_IS_IMAGE && ~IMG
-        fprintf('\nERROR: IMG vale 0 (no usar imagenes) y el target es IMG (TARGET_IS_IMAGE == 1). AsÃ­ no tendrÃ­a mucho sentido.\n')
+        fprintf('\nERROR: IMG vale 0 (no usar imagenes) y el target es IMG (TARGET_IS_IMAGE == 1). Asi no tendria mucho sentido.\n')
         quit
     end
     if ~TARGET_IS_IMAGE && ~SND
-        fprintf('\nERROR: SND vale 0 (no usar imagenes) y el target es SND (TARGET_IS_IMAGE == 0). AsÃ­ no tendrÃ­a mucho sentido.\n')
+        fprintf('\nERROR: SND vale 0 (no usar imagenes) y el target es SND (TARGET_IS_IMAGE == 0). Asi no tendria mucho sentido.\n')
         quit
     end
     if (IMG ~= SND) && (DELAY ~= 0)
@@ -46,7 +46,7 @@ function Imagenes
     end
 
     FULLSCREEN = 0;
-    
+
     KbName('UnifyKeyNames');
 
     try
@@ -74,14 +74,12 @@ function Imagenes
         BLACK = BlackIndex(screenNumber);
         GREY = GrayIndex(screenNumber);
 
-        % Open a double buffered fullscreen window and draw a gray background
-        % and front and back buffers.
+        % Open a double buffered (maybe fullscreen)
         if FULLSCREEN
             windowSize = [];
         else
             windowSize = [100 100 900 900];
         end
-
         [w, wRect] = Screen('OpenWindow',screenNumber, 0, windowSize, 32, 2);
         [wcx, wcy] = RectCenter(wRect);
 
@@ -175,7 +173,7 @@ function Imagenes
             [pressed, firstPressTimes, firstReleaseTimes, lastPressTimes, lastReleaseTimes] = KbQueueCheck();
             index_pressed = find(firstPressTimes);
 
-            if pressed && find(index_pressed) == quitKeyCode % alguna de las teclas apretadas fue la de salir
+            if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
                 CleanupPTB();
                 quit;
             end
@@ -191,11 +189,11 @@ function Imagenes
                 if (pressed ... % se apreto algo
                    && index_pressed == tapKeyCode ...% se apreto la barra
                    && length(index_pressed) == 1 ... % se apreto solamente una tecla (la barra)
-                   && firsPtressTimes(tapKeyCode) == lastPressTimes(tapKeyCode) ... % se apreto una sola vez (la primera y ultima vez son la misma)
+                   && firstPressTimes(tapKeyCode) == lastPressTimes(tapKeyCode) ... % se apreto una sola vez (la primera y ultima vez son la misma)
                    ) % Trial valido
                     remaining_trials = remaining_trials - 1;
 
-% Capaz conviene normalizar esto con el intervalo entre estÃ­mulos?
+% Capaz conviene normalizar esto con el intervalo entre estimulos?
 % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
 % que se apreto la teclajusto cuando aparecio el estimulo anterior
                     time_samples(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode) - target_time;
@@ -221,8 +219,8 @@ function Imagenes
     % This "catch" section executes in case of an error in the "try" section
     % above.  Importantly, it closes the onscreen window if it's open.
     catch
-        CleanupPTB();
         psychrethrow(psychlasterror);
+        CleanupPTB();
     end
 
 end
