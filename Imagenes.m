@@ -125,7 +125,12 @@ function Imagenes
 
         i = 1;
         quitKeyCode = 10; % escape
-        tapKeyCode = KbName('SPACE'); % barra espaciadora
+        if IsWin
+            tapKeyCode = KbName('SPACE'); % barra espaciadora
+        else
+            tapKeyCode = 66; % anda en los labos y en octave
+        end
+
         time_samples = [];
         remaining_trials = TOTAL_TRIALS;
 
