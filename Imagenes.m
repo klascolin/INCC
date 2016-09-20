@@ -207,10 +207,8 @@ function Imagenes(delay, img, snd,target)
                     time_firstPress(TOTAL_TRIALS - remaining_trials) = 0
                     time_lastPress(TOTAL_TRIALS - remaining_trials) = 0
                 end
-
                 KbQueueFlush();
             end
-
             i = mod(i, IMG_NUMBER) + 1;
         end
 
