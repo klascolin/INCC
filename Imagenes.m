@@ -1,9 +1,10 @@
 function Imagenes(delay, img, snd,target)
-
+    format long;
 
     global oldVisualDebugLevel;
     global oldSupressAllWarnings;
     global audioHandle;
+    global SND;
 
     % Parameters definitions
 
@@ -19,7 +20,7 @@ function Imagenes(delay, img, snd,target)
     %    si > 0 sonido despues
     %    si < 0 sonido antes
     DELAY = delay;
-    
+
     % define si el sujeto deberia seguir la imagen o el sonido.
     %   1 == si, seguir la imagen
     %   0 == no, seguir el sonido
@@ -53,17 +54,19 @@ function Imagenes(delay, img, snd,target)
     try
         AssertOpenGL;
 
-        % Perform basic initialization of the sound driver:
-        InitializePsychSound;
+        if SND
+          % Perform basic initialization of the sound driver:
+          InitializePsychSound;
 
-        wavedata = cell(1, SND_NUMBER);
-        y = cell(1, SND_NUMBER);
-        freq = [];
-        nrchannels = [];
-        for i = 1:SND_NUMBER
-            [y{i}, freq] = wavread(['beep' sprintf('%d', i) '.wav']);
-            wavedata{i} = y{i}';
-            nrchannels = size(wavedata{i}, 1); % Number of rows == number of channels.
+          wavedata = cell(1, SND_NUMBER);
+          y = cell(1, SND_NUMBER);
+          freq = [];
+          nrchannels = [];
+          for i = 1:SND_NUMBER
+              [y{i}, freq] = wavread(['beep' sprintf('%d', i) '.wav']);
+              wavedata{i} = y{i}';
+              nrchannels = size(wavedata{i}, 1); % Number of rows == number of channels.
+          end
         end
 
         oldVisualDebugLevel = Screen('Preference', 'VisualDebugLevel', 3);
@@ -98,21 +101,23 @@ function Imagenes(delay, img, snd,target)
             iCenter{i} = [cx, cy];
         end
 
-        % Open the default audio device [], with default mode [] (==Only playback),
-        % and a required latencyclass of zero 0 == no low-latency mode, as well as
-        % a frequency of freq and nrchannels sound channels.
-        % This returns a handle to the audio device:
-%         try
-%             % Try with the 'freq'uency we wanted:
-%            % audioHandle = PsychPortAudio('Open', [], [], 0, freq, nrchannels);
-%         catch
-%             % Failed. Retry with default frequency as suggested by device:
-%             fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', freq);
-%             fprintf('Sound may sound a bit out of tune, ...\n\n');
-% 
-%             psychlasterror('reset');
-%             audioHandle = PsychPortAudio('Open', [], [], 0, [], nrchannels);
-%         end
+        if SND
+          % Open the default audio device [], with default mode [] (==Only playback),
+          % and a required latencyclass of zero 0 == no low-latency mode, as well as
+          % a frequency of freq and nrchannels sound channels.
+          % This returns a handle to the audio device:
+          try
+              % Try with the 'freq'uency we wanted:
+              audioHandle = PsychPortAudio('Open', [], [], 0, freq, nrchannels);
+          catch
+              % Failed. Retry with default frequency as suggested by device:
+              fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', freq);
+              fprintf('Sound may sound a bit out of tune, ...\n\n');
+
+              psychlasterror('reset');
+              audioHandle = PsychPortAudio('Open', [], [], 0, [], nrchannels);
+          end
+        end
 
         % Blank sceen
         Screen('FillRect', w, uint8(BLACK));
@@ -125,9 +130,9 @@ function Imagenes(delay, img, snd,target)
         i = 1;
         quitKeyCode = 10; % escape
         if IsWin
-            tapKeyCode = KbName('SPACE'); % barra espaciadora
+            tapKeyCode = KbName('SPACE') % barra espaciadora
         else
-            tapKeyCode = 66; % anda en los labos y en octave
+            tapKeyCode = 66 % anda en los labos y en octave
         end
 
         time_firstPress = [];
@@ -156,11 +161,11 @@ function Imagenes(delay, img, snd,target)
                 img_time = GetSecs();
                 WaitSecs(delay);
             end
-%             if SND
-%                 PsychPortAudio('FillBuffer', audioHandle, wavedata{1 + (i == IMG_NUMBER)});
-%                 PsychPortAudio('Start', audioHandle, 1, 0, 1);
-%                 snd_time = GetSecs();
-%             end
+            if SND
+                PsychPortAudio('FillBuffer', audioHandle, wavedata{1 + (i == IMG_NUMBER)});
+                PsychPortAudio('Start', audioHandle, 1, 0, 1);
+                snd_time = GetSecs();
+            end
             if IMG && ~img_before_sound
                 WaitSecs(delay);
                 Screen('DrawTexture', w, imagetex{i}, iRect{i});
@@ -173,7 +178,7 @@ function Imagenes(delay, img, snd,target)
 
             [pressed, firstPressTimes, firstReleaseTimes, lastPressTimes, lastReleaseTimes] = KbQueueCheck();
             index_pressed = find(firstPressTimes);
-        
+
 
             if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
                 CleanupPTB();
@@ -196,13 +201,13 @@ function Imagenes(delay, img, snd,target)
                     % que se apreto la teclajusto cuando aparecio el estimulo anterior
                     time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
                     time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
-                   
+
                 else %trial invalido
                     disp(1)
                     time_firstPress(TOTAL_TRIALS - remaining_trials) = 0
                     time_lastPress(TOTAL_TRIALS - remaining_trials) = 0
                 end
-           
+
                 KbQueueFlush();
             end
 
@@ -235,12 +240,15 @@ function CleanupPTB
     global oldVisualDebugLevel;
     global oldSupressAllWarnings;
     global audioHandle;
+    global SND;
 
-    % Stop playback:
-    PsychPortAudio('Stop', audioHandle);
+    if SND
+      % Stop playback:
+      PsychPortAudio('Stop', audioHandle);
 
-    % Close the audio device:
-    PsychPortAudio('Close', audioHandle);
+      % Close the audio device:
+      PsychPortAudio('Close', audioHandle);
+    end
 
     % The same command which closes onscreen and offscreen windows also
     % closes textures.
