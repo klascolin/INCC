@@ -176,15 +176,6 @@ function Imagenes(delay, img, snd,target)
 
             WaitSecs(INTERVAL - delay);
 
-            [pressed, firstPressTimes, firstReleaseTimes, lastPressTimes, lastReleaseTimes] = KbQueueCheck();
-            index_pressed = find(firstPressTimes);
-
-
-            if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
-                CleanupPTB();
-                quit;
-            end
-
             if i == IMG_NUMBER
                 % Ya se mostro la imagen final.
                 remaining_trials = remaining_trials - 1;
@@ -194,7 +185,19 @@ function Imagenes(delay, img, snd,target)
                     target_time(TOTAL_TRIALS-remaining_trials) = snd_time;
                 end
 
-                if (pressed) % se apreto algo
+                [pressed, firstPressTimes, firstReleaseTimes, lastPressTimes, lastReleaseTimes] = KbQueueCheck();
+                index_pressed = find(firstPressTimes);
+
+                if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
+                    CleanupPTB();
+                    quit;
+                end
+
+                if (pressed ...  % se apreto algo
+                    && index_pressed == tapKeyCode ...% se apreto la barra
+%                   && length(index_pressed) == 1 ... % se apreto solamente una tecla (la barra)
+
+                    )
                     % Trial valido
                     % Capaz conviene normalizar esto con el intervalo entre estimulos?
                     % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
