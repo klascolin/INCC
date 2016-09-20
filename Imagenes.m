@@ -31,16 +31,13 @@ function Imagenes(delay, img, snd,target)
     SND = snd;
 
     if ~IMG && ~SND
-        fprintf('\nERROR: O bien IMG va en 1 o SND va en 1!!\n')
-        quit
+        error('\nERROR: O bien IMG va en 1 o SND va en 1!!\n')
     end
     if TARGET_IS_IMAGE && ~IMG
-        fprintf('\nERROR: IMG vale 0 (no usar imagenes) y el target es IMG (TARGET_IS_IMAGE == 1). Asi no tendria mucho sentido.\n')
-        quit
+        error('\nERROR: IMG vale 0 (no usar imagenes) y el target es IMG (TARGET_IS_IMAGE == 1). Asi no tendria mucho sentido.\n')
     end
     if ~TARGET_IS_IMAGE && ~SND
-        fprintf('\nERROR: SND vale 0 (no usar imagenes) y el target es SND (TARGET_IS_IMAGE == 0). Asi no tendria mucho sentido.\n')
-        quit
+        error('\nERROR: SND vale 0 (no usar imagenes) y el target es SND (TARGET_IS_IMAGE == 0). Asi no tendria mucho sentido.\n')
     end
     if (IMG ~= SND) && (DELAY ~= 0)
         DELAY = 0
@@ -190,7 +187,7 @@ function Imagenes(delay, img, snd,target)
 
                 if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
                     CleanupPTB();
-                    quit;
+                    error('Se apreto ESC, saliendo');
                 end
 
                 if (pressed ...  % se apreto algo
