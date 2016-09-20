@@ -1,10 +1,14 @@
 %bloque 1
 %el sujeto  solamente ve imagen
+%IMAGEN BIENVENIDA BLOQUE UNO MAS INSTRUCCIONES
+%BLOQUE PRACTICA
+%FIJACION
 img = 1
 snd = 0
 delay = 0
 target = 1
 Imagenes(delay, img, snd,target,5)
+%FIN BLOQUE UNO 
 %bloque 2
 %el sujeto  solamente ve sondio
 img = 0
