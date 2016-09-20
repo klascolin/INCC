@@ -3,10 +3,10 @@ function bloques
 
     format long g;
 
-% constantes
+    % constantes
     USE_FULLSCREEN = 1;
     USE_WINDOWED = 0;
-% /constantes
+    % /constantes
 
     try
         InitPTB(USE_WINDOWED)
@@ -88,6 +88,8 @@ function bloques
         target = 0
         Tap(delay, img, snd, target, 5)
 
+
+        CleanupPTB();
     % This "catch" section executes in case of an error in the "try" section
     % above.  Importantly, it closes the onscreen window if it's open.
     catch
@@ -111,7 +113,7 @@ function InitPTB(fullscreen)
     global BLACK;
 
 
-    IMG_NUMBER = 3;
+    IMG_NUMBER = 4;
     SND_NUMBER = 2;
 
     FULLSCREEN = fullscreen;

@@ -115,10 +115,10 @@ function Tap(delay, img, snd, target, total_trials)
 
             if (pressed && firstPressTimes(tapKeyCode) ~= 0) % se apreto la barra
                 % Trial valido
-                time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
+            time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
                 time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
 
-            else %trial invalido
+            else % Trial invalido
                 disp(1)
                 time_firstPress(TOTAL_TRIALS - remaining_trials) = 0
                 time_lastPress(TOTAL_TRIALS - remaining_trials) = 0
