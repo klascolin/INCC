@@ -191,13 +191,8 @@ function Imagenes(delay, img, snd,target,total_trials)
                 end
 
                 if (pressed ...  % se apreto algo
-                    && index_pressed(tapKeyCode) == tapKeyCode ) % se apreto la barra
-%                   && length(index_pressed) == 1 ... % se apreto solamente una tecla (la barra)
-
+                    && firstPressTimes(tapKeyCode) ~= 0 ) % se apreto la barra
                     % Trial valido
-                    % Capaz conviene normalizar esto con el intervalo entre estimulos?
-                    % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
-                    % que se apreto la teclajusto cuando aparecio el estimulo anterior
                     time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
                     time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
 
