@@ -1,16 +1,19 @@
-function Imagenes(delay, img, snd,target,total_trials)
-    format long;
 
-    global oldVisualDebugLevel;
-    global oldSupressAllWarnings;
+function Imagenes(delay, img, snd, target, total_trials)
+
     global audioHandle;
+    global windowHandle;
     global SND;
+    global BLACK;
+    global IMG_NUMBER;
+
+    global imagetex;
+    global iRect;
+    global iCenter;
+    global wavedata;
 
     % Parameters definitions
-
     TOTAL_TRIALS = total_trials;
-    IMG_NUMBER = 4;
-    SND_NUMBER = 2;
 
     % tiempo (regular) entre estimulos, en segundos
     INTERVAL = 0.5;
@@ -43,217 +46,96 @@ function Imagenes(delay, img, snd,target,total_trials)
         DELAY = 0
         fprintf('\nINFO: El delay entre sonido e imagenes no era 0, pero como no se estan usando ambas se cambia a 0\n')
     end
-
-    FULLSCREEN = 0;
-
-    KbName('UnifyKeyNames');
-
-    try
-        AssertOpenGL;
-
-        if SND
-          % Perform basic initialization of the sound driver:
-          InitializePsychSound;
-
-          wavedata = cell(1, SND_NUMBER);
-          y = cell(1, SND_NUMBER);
-          freq = [];
-          nrchannels = [];
-          for i = 1:SND_NUMBER
-              [y{i}, freq] = wavread(['beep' sprintf('%d', i) '.wav']);
-              wavedata{i} = y{i}';
-              nrchannels = size(wavedata{i}, 1); % Number of rows == number of channels.
-          end
-        end
-
-        oldVisualDebugLevel = Screen('Preference', 'VisualDebugLevel', 3);
-        oldSupressAllWarnings = Screen('Preference', 'SuppressAllWarnings', 1);
-
-        % Color definitions
-        screenNumber = max(Screen('Screens'));
-        WHITE = WhiteIndex(screenNumber);
-        BLACK = BlackIndex(screenNumber);
-        GREY = GrayIndex(screenNumber);
-
-        % Open a double buffered (maybe fullscreen)
-        if FULLSCREEN
-            windowSize = [];
-        else
-            windowSize = [100 100 900 900];
-        end
-        [w, wRect] = Screen('OpenWindow',screenNumber, 0, windowSize, 32, 2);
-        [wcx, wcy] = RectCenter(wRect);
-
-        % Import image and and convert it, stored in
-        % MATLAB matrix, into a Psychtoolbox OpenGL texture using 'MakeTexture';
-        imdata = cell(1, IMG_NUMBER);
-        imagetex = cell(1, IMG_NUMBER);
-        iRect = cell(1, IMG_NUMBER);
-        iCenter = cell(1, IMG_NUMBER);
-        for i = 1:IMG_NUMBER
-            imdata{i} = imread(['col' sprintf('%d', i) '.jpg']);
-            imagetex{i} = Screen('MakeTexture', w, imdata{i});
-            iRect{i} = Screen('Rect', imagetex{i});
-            [cx, cy] = RectCenter(iRect{i});
-            iCenter{i} = [cx, cy];
-        end
-
-        if SND
-          % Open the default audio device [], with default mode [] (==Only playback),
-          % and a required latencyclass of zero 0 == no low-latency mode, as well as
-          % a frequency of freq and nrchannels sound channels.
-          % This returns a handle to the audio device:
-          try
-              % Try with the 'freq'uency we wanted:
-              audioHandle = PsychPortAudio('Open', [], [], 0, freq, nrchannels);
-          catch
-              % Failed. Retry with default frequency as suggested by device:
-              fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', freq);
-              fprintf('Sound may sound a bit out of tune, ...\n\n');
-
-              psychlasterror('reset');
-              audioHandle = PsychPortAudio('Open', [], [], 0, [], nrchannels);
-          end
-        end
-
-        % Blank sceen
-        Screen('FillRect', w, uint8(BLACK));
-        Screen('Flip', w);
-
-        % Bump priority for speed
-        priorityLevel = MaxPriority(w);
-        Priority(priorityLevel);
-
-        i = 1;
-        quitKeyCode = 10; % escape
-        if IsWin
-            tapKeyCode = KbName('SPACE') % barra espaciadora
-        else
-            tapKeyCode = 66 % anda en los labos y en octave
-        end
-
-        time_firstPress = [];
-        remaining_trials = TOTAL_TRIALS;
-
-        img_before_sound = DELAY > 0;
-        delay = abs(DELAY);
-
-        KbQueueCreate();
-        KbQueueStart();
-
-        % paint it white
-        Screen('FillRect', w, WHITE)
-        Screen('Flip', w);
-
-        %%% THE TRIALS BEGIN %%%
-
-        while (remaining_trials > 0)
-            Screen('FillRect', w, WHITE)
-            % Useful info for user about how to quit.
-            % Screen('DrawText', w, 'Bienvenido! Para marcar el final usa la barra espaciadora. Esc para salir', 32, 32, BLACK);
-
-            if IMG && img_before_sound
-                Screen('DrawTexture', w, imagetex{i}, iRect{i});
-                Screen('Flip', w);
-                img_time = GetSecs();
-                WaitSecs(delay);
-            end
-            if SND
-                PsychPortAudio('FillBuffer', audioHandle, wavedata{1 + (i == IMG_NUMBER)});
-                PsychPortAudio('Start', audioHandle, 1, 0, 1);
-                snd_time = GetSecs();
-            end
-            if IMG && ~img_before_sound
-                WaitSecs(delay);
-                Screen('DrawTexture', w, imagetex{i}, iRect{i});
-                Screen('Flip', w);
-                img_time = GetSecs();
-            end
-
-
-            WaitSecs(INTERVAL - delay);
-
-            if i == IMG_NUMBER
-                % Ya se mostro la imagen final.
-                remaining_trials = remaining_trials - 1;
-                if TARGET_IS_IMAGE
-                    target_time(TOTAL_TRIALS-remaining_trials) = img_time;
-                else
-                    target_time(TOTAL_TRIALS-remaining_trials) = snd_time;
-                end
-
-                [pressed, firstPressTimes, firstReleaseTimes, lastPressTimes, lastReleaseTimes] = KbQueueCheck();
-                index_pressed = find(firstPressTimes);
-
-                if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
-                    CleanupPTB();
-                    error('Se apreto ESC, saliendo');
-                end
-
-                if (pressed ...  % se apreto algo
-                    && index_pressed(tapKeyCode) == tapKeyCode ) % se apreto la barra
-%                   && length(index_pressed) == 1 ... % se apreto solamente una tecla (la barra)
-
-                    % Trial valido
-                    % Capaz conviene normalizar esto con el intervalo entre estimulos?
-                    % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
-                    % que se apreto la teclajusto cuando aparecio el estimulo anterior
-                    time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
-                    time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
-
-                else %trial invalido
-                    disp(1)
-                    time_firstPress(TOTAL_TRIALS - remaining_trials) = 0
-                    time_lastPress(TOTAL_TRIALS - remaining_trials) = 0
-                end
-                KbQueueFlush();
-            end
-            i = mod(i, IMG_NUMBER) + 1;
-        end
-
-        % Show results on console
-        disp('')
-        disp('Showing samples obtained on this run:');
-        disp(time_firstPress-target_time)
-        disp('Showing mean obtained on this run:');
-        run_mean = mean(time_firstPress)
-        disp('Showing var obtained on this run:');
-        run_var = var(time_firstPress)
-
-        CleanupPTB();
-
-    % This "catch" section executes in case of an error in the "try" section
-    % above.  Importantly, it closes the onscreen window if it's open.
-    catch
-        psychrethrow(psychlasterror);
-        CleanupPTB();
+    i = 1;
+    quitKeyCode = 10; % escape
+    if IsWin
+        tapKeyCode = KbName('SPACE'); % barra espaciadora
+    else
+        tapKeyCode = 66; % anda en los labos y en octave
     end
 
-end
+    time_firstPress = [];
+    remaining_trials = TOTAL_TRIALS;
 
-function CleanupPTB
+    img_before_sound = DELAY > 0;
+    delay = abs(DELAY);
 
-    global oldVisualDebugLevel;
-    global oldSupressAllWarnings;
-    global audioHandle;
-    global SND;
+    KbQueueCreate();
+    KbQueueStart();
 
-    if SND
-      % Stop playback:
-      PsychPortAudio('Stop', audioHandle);
+    % paint it white
+    Screen('FillRect', windowHandle, BLACK)
+    Screen('Flip', windowHandle);
 
-      % Close the audio device:
-      PsychPortAudio('Close', audioHandle);
+    %%% THE TRIALS BEGIN %%%
+
+    while (remaining_trials > 0)
+
+        Screen('FillRect', windowHandle, BLACK)
+        % Useful info for user about how to quit.
+        % Screen('DrawText', windowHandle, 'Bienvenido! Para marcar el final usa la barra espaciadora. Esc para salir', 32, 32, BLACK);
+
+        if IMG && img_before_sound
+            Screen('DrawTexture', windowHandle, imagetex{i}, iRect{i});
+            Screen('Flip', windowHandle);
+            img_time = GetSecs();
+            WaitSecs(delay);
+        end
+        if SND
+            PsychPortAudio('FillBuffer', audioHandle, wavedata{1 + (i == IMG_NUMBER)});
+            PsychPortAudio('Start', audioHandle, 1, 0, 1);
+            snd_time = GetSecs();
+        end
+        if IMG && ~img_before_sound
+            WaitSecs(delay);
+            Screen('DrawTexture', windowHandle, imagetex{i}, iRect{i});
+            Screen('Flip', windowHandle);
+            img_time = GetSecs();
+        end
+
+
+        WaitSecs(INTERVAL - delay);
+
+        if i == IMG_NUMBER
+            % Ya se mostro la imagen final.
+            remaining_trials = remaining_trials - 1;
+            if TARGET_IS_IMAGE
+                target_time(TOTAL_TRIALS-remaining_trials) = img_time;
+            else
+                target_time(TOTAL_TRIALS-remaining_trials) = snd_time;
+            end
+
+            [pressed, firstPressTimes, firstReleaseTimes, lastPressTimes, lastReleaseTimes] = KbQueueCheck();
+            index_pressed = find(firstPressTimes);
+
+            if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
+                CleanupPTB();
+                error('Se apreto ESC, saliendo');
+            end
+
+            if (pressed && index_pressed == tapKeyCode) % se apreto la barra
+                % Trial valido
+                % Capaz conviene normalizar esto con el intervalo entre estimulos?
+                % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
+                % que se apreto la teclajusto cuando aparecio el estimulo anterior
+                time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
+                time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
+
+            else %trial invalido
+                disp(1)
+                time_firstPress(TOTAL_TRIALS - remaining_trials) = 0
+                time_lastPress(TOTAL_TRIALS - remaining_trials) = 0
+            end
+            KbQueueFlush();
+        end
+
+        i = mod(i, IMG_NUMBER) + 1;
+
     end
 
-    % The same command which closes onscreen and offscreen windows also
-    % closes textures.
-    Screen('CloseAll');
-    ShowCursor;
-    Priority(0);
+    % Show results on console
+    disp('')
+    disp('Showing samples obtained on this run:');
+    disp(time_firstPress)
 
-    % Restore preferences
-    Screen('Preference', 'VisualDebugLevel', oldVisualDebugLevel);
-    Screen('Preference', 'SuppressAllWarnings', oldSupressAllWarnings);
 end
-%%
