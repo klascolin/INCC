@@ -1,4 +1,4 @@
-function Imagenes(delay, img, snd,target)
+function Imagenes(delay, img, snd,target,total_trials)
     format long;
 
     global oldVisualDebugLevel;
@@ -8,8 +8,8 @@ function Imagenes(delay, img, snd,target)
 
     % Parameters definitions
 
-    TOTAL_TRIALS = 3;
-    IMG_NUMBER = 3;
+    TOTAL_TRIALS = total_trials;
+    IMG_NUMBER = 4;
     SND_NUMBER = 2;
 
     % tiempo (regular) entre estimulos, en segundos
@@ -44,7 +44,7 @@ function Imagenes(delay, img, snd,target)
         fprintf('\nINFO: El delay entre sonido e imagenes no era 0, pero como no se estan usando ambas se cambia a 0\n')
     end
 
-    FULLSCREEN = 1;
+    FULLSCREEN = 0;
 
     KbName('UnifyKeyNames');
 
@@ -191,10 +191,9 @@ function Imagenes(delay, img, snd,target)
                 end
 
                 if (pressed ...  % se apreto algo
-                    && index_pressed == tapKeyCode ...% se apreto la barra
+                    && index_pressed(tapKeyCode) == tapKeyCode ) % se apreto la barra
 %                   && length(index_pressed) == 1 ... % se apreto solamente una tecla (la barra)
 
-                    )
                     % Trial valido
                     % Capaz conviene normalizar esto con el intervalo entre estimulos?
                     % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
@@ -215,8 +214,7 @@ function Imagenes(delay, img, snd,target)
         % Show results on console
         disp('')
         disp('Showing samples obtained on this run:');
-        disp(time_firstPress)
-        disp(target_time)
+        disp(time_firstPress-target_time)
         disp('Showing mean obtained on this run:');
         run_mean = mean(time_firstPress)
         disp('Showing var obtained on this run:');
