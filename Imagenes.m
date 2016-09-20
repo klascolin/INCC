@@ -1,4 +1,5 @@
-function Imagenes
+function Imagenes(delay, img, snd,target)
+
 
     global oldVisualDebugLevel;
     global oldSupressAllWarnings;
@@ -17,16 +18,16 @@ function Imagenes
     %    si = 0 sincronizados
     %    si > 0 sonido despues
     %    si < 0 sonido antes
-    DELAY = 0.2;
-
+    DELAY = delay;
+    
     % define si el sujeto deberia seguir la imagen o el sonido.
     %   1 == si, seguir la imagen
-    %   2 == no, seguir el sonido
-    TARGET_IS_IMAGE = 1;
+    %   0 == no, seguir el sonido
+    TARGET_IS_IMAGE = target;
 
     % usar imagen / sonido
-    IMG = 1;
-    SND = 1;
+    IMG = img;
+    SND = snd;
 
     if ~IMG && ~SND
         fprintf('\nERROR: O bien IMG va en 1 o SND va en 1!!\n')
@@ -45,7 +46,7 @@ function Imagenes
         fprintf('\nINFO: El delay entre sonido e imagenes no era 0, pero como no se estan usando ambas se cambia a 0\n')
     end
 
-    FULLSCREEN = 0;
+    FULLSCREEN = 1;
 
     KbName('UnifyKeyNames');
 
@@ -101,17 +102,17 @@ function Imagenes
         % and a required latencyclass of zero 0 == no low-latency mode, as well as
         % a frequency of freq and nrchannels sound channels.
         % This returns a handle to the audio device:
-        try
-            % Try with the 'freq'uency we wanted:
-            audioHandle = PsychPortAudio('Open', [], [], 0, freq, nrchannels);
-        catch
-            % Failed. Retry with default frequency as suggested by device:
-            fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', freq);
-            fprintf('Sound may sound a bit out of tune, ...\n\n');
-
-            psychlasterror('reset');
-            audioHandle = PsychPortAudio('Open', [], [], 0, [], nrchannels);
-        end
+%         try
+%             % Try with the 'freq'uency we wanted:
+%            % audioHandle = PsychPortAudio('Open', [], [], 0, freq, nrchannels);
+%         catch
+%             % Failed. Retry with default frequency as suggested by device:
+%             fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', freq);
+%             fprintf('Sound may sound a bit out of tune, ...\n\n');
+% 
+%             psychlasterror('reset');
+%             audioHandle = PsychPortAudio('Open', [], [], 0, [], nrchannels);
+%         end
 
         % Blank sceen
         Screen('FillRect', w, uint8(BLACK));
@@ -129,7 +130,7 @@ function Imagenes
             tapKeyCode = 66; % anda en los labos y en octave
         end
 
-        time_samples = [];
+        time_firstPress = [];
         remaining_trials = TOTAL_TRIALS;
 
         img_before_sound = DELAY > 0;
@@ -155,11 +156,11 @@ function Imagenes
                 img_time = GetSecs();
                 WaitSecs(delay);
             end
-            if SND
-                PsychPortAudio('FillBuffer', audioHandle, wavedata{1 + (i == IMG_NUMBER)});
-                PsychPortAudio('Start', audioHandle, 1, 0, 1);
-                snd_time = GetSecs();
-            end
+%             if SND
+%                 PsychPortAudio('FillBuffer', audioHandle, wavedata{1 + (i == IMG_NUMBER)});
+%                 PsychPortAudio('Start', audioHandle, 1, 0, 1);
+%                 snd_time = GetSecs();
+%             end
             if IMG && ~img_before_sound
                 WaitSecs(delay);
                 Screen('DrawTexture', w, imagetex{i}, iRect{i});
@@ -172,6 +173,7 @@ function Imagenes
 
             [pressed, firstPressTimes, firstReleaseTimes, lastPressTimes, lastReleaseTimes] = KbQueueCheck();
             index_pressed = find(firstPressTimes);
+        
 
             if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
                 CleanupPTB();
@@ -180,25 +182,27 @@ function Imagenes
 
             if i == IMG_NUMBER
                 % Ya se mostro la imagen final.
+                remaining_trials = remaining_trials - 1;
                 if TARGET_IS_IMAGE
-                    target_time = img_time;
+                    target_time(TOTAL_TRIALS-remaining_trials) = img_time;
                 else
-                    target_time = snd_time;
+                    target_time(TOTAL_TRIALS-remaining_trials) = snd_time;
                 end
 
-                if (pressed ... % se apreto algo
-                   && index_pressed == tapKeyCode ...% se apreto la barra
-                   && length(index_pressed) == 1 ... % se apreto solamente una tecla (la barra)
-                   && firstPressTimes(tapKeyCode) == lastPressTimes(tapKeyCode) ... % se apreto una sola vez (la primera y ultima vez son la misma)
-                   ) % Trial valido
-                    remaining_trials = remaining_trials - 1;
-
-% Capaz conviene normalizar esto con el intervalo entre estimulos?
-% o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
-% que se apreto la teclajusto cuando aparecio el estimulo anterior
-                    time_samples(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode) - target_time;
+                if (pressed) % se apreto algo
+                    % Trial valido
+                    % Capaz conviene normalizar esto con el intervalo entre estimulos?
+                    % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
+                    % que se apreto la teclajusto cuando aparecio el estimulo anterior
+                    time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
+                    time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
+                   
+                else %trial invalido
+                    disp(1)
+                    time_firstPress(TOTAL_TRIALS - remaining_trials) = 0
+                    time_lastPress(TOTAL_TRIALS - remaining_trials) = 0
                 end
-
+           
                 KbQueueFlush();
             end
 
@@ -208,11 +212,12 @@ function Imagenes
         % Show results on console
         disp('')
         disp('Showing samples obtained on this run:');
-        disp(time_samples)
+        disp(time_firstPress)
+        disp(target_time)
         disp('Showing mean obtained on this run:');
-        run_mean = mean(time_samples)
+        run_mean = mean(time_firstPress)
         disp('Showing var obtained on this run:');
-        run_var = var(time_samples)
+        run_var = var(time_firstPress)
 
         CleanupPTB();
 
@@ -247,3 +252,4 @@ function CleanupPTB
     Screen('Preference', 'VisualDebugLevel', oldVisualDebugLevel);
     Screen('Preference', 'SuppressAllWarnings', oldSupressAllWarnings);
 end
+%%
