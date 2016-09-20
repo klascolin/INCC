@@ -113,11 +113,8 @@ function Tap(delay, img, snd, target, total_trials)
                 error('Se apreto ESC, saliendo');
             end
 
-            if (pressed && index_pressed == tapKeyCode) % se apreto la barra
+            if (pressed && firstPressTimes(tapKeyCode) ~= 0) % se apreto la barra
                 % Trial valido
-                % Capaz conviene normalizar esto con el intervalo entre estimulos?
-                % o sea en vez de poner el delta en segundos... quedaria que si esto vale -1 significa
-                % que se apreto la teclajusto cuando aparecio el estimulo anterior
                 time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
                 time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
 
