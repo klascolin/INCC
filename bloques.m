@@ -17,7 +17,7 @@ function bloques
         snd = 0
         delay = 0
         target = 1
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 2
         % el sujeto  solamente ve sondio
@@ -25,7 +25,7 @@ function bloques
         snd = 1
         delay = 0
         target = 0
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 3
         % el sujeto ve imagen y sonido sincronizado
@@ -33,7 +33,7 @@ function bloques
         snd = 1
         delay = 0
         target = 1 % no importa
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 4
         % el sujeto ve imagen y sonido + 0.25, sigue a la imagen
@@ -41,7 +41,7 @@ function bloques
         snd = 1
         delay = 0.25
         target = 1
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 5
         % el sujeto ve imagen y sonido + 0.5, sigue a la imagen
@@ -49,7 +49,7 @@ function bloques
         snd = 1
         delay = 0.5
         target = 1
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 6
         % el sujeto ve imagen y sonido + 0.75, sigue a la imagen
@@ -57,7 +57,7 @@ function bloques
         snd = 1
         delay = 0.75
         target = 1
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 7
         % el sujeto ve imagen y sonido -0.25 , sigue al sonido
@@ -65,7 +65,7 @@ function bloques
         snd = 1
         delay = 0.25
         target = 0
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 8
         % el sujeto ve imagen y sonido -0.5 , sigue al sonido
@@ -73,7 +73,7 @@ function bloques
         snd = 1
         delay = 0.5
         target = 0
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
         % bloque 9
         % el sujeto ve imagen y sonido -0.75 , sigue al sonido
@@ -81,7 +81,7 @@ function bloques
         snd = 1
         delay = 0.75
         target = 0
-        Imagenes(delay, img, snd, target, 5)
+        Tap(delay, img, snd, target, 5)
 
     % This "catch" section executes in case of an error in the "try" section
     % above.  Importantly, it closes the onscreen window if it's open.

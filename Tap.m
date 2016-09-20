@@ -1,5 +1,5 @@
 
-function Imagenes(delay, img, snd, target, total_trials)
+function Tap(delay, img, snd, target, total_trials)
 
     global audioHandle;
     global windowHandle;
