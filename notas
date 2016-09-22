@@ -1,0 +1,16 @@
+condiciones:
+* solo sonido
+* solo imagen
+* imagen-sonido lag=[-500 -250 -50 0 50 250 500]
+9 condiciones
+
+2 segundos x trial   
+
+bloques
+* 15 trials de la misma condicion
+* 30s por bloque + 10s descanso = 40s/bloque
+
+9 bloques * 40s/bloque = 360s = 6min
+
+1. 9 condiciones permut
+2. 9 condiciones permut

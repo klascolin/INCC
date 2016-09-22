@@ -2,94 +2,61 @@ function bloques
 % MAIN
 
     format long g;
-
     % constantes
     USE_FULLSCREEN = 1;
     USE_WINDOWED = 0;
+
+    DELAY_0 = 0;
+    DELAY_1 = 0.25/2;
+    DELAY_2 = 0.50/2;
+    DELAY_3 = 0.75/2;
+
+    IMG_SI = 1;
+    IMG_NO = 0;
+
+    SND_SI = 1;
+    SND_NO = 0;
+
+    SEGUIR_IMG = 1;
+    SEGUIR_SND = 0;
+
+    TRIALS_BLOQUE_PRACTICA = 5;
+    TRIALS_BLOQUE_COMUN = 15;
     % /constantes
 
     try
         InitPTB(USE_WINDOWED)
 
-        % bloque 1
-        % el sujeto  solamente ve imagen
+        practica = [
+            [ DELAY_0, IMG_SI, SND_NO, SEGUIR_IMG, TRIALS_BLOQUE_PRACTICA];
+            [ DELAY_0, IMG_NO, SND_SI, SEGUIR_SND, TRIALS_BLOQUE_PRACTICA];
+            [ DELAY_0, IMG_SI, SND_SI, SEGUIR_IMG, TRIALS_BLOQUE_PRACTICA];
+        ]
 
-        %IMAGEN BIENVENIDA BLOQUE UNO MAS INSTRUCCIONES
-        %BLOQUE PRACTICA
-        %FIJACION
-        img = 1
-        snd = 0
-        delay = 0
-        target = 1
-        Tap(delay, img, snd, target, 5)
-        %FIN BLOQUE UNO
+        que_seguir = SEGUIR_IMG; % elegirlo bien
 
-        % bloque 2
-        % el sujeto  solamente ve sondio
-        img = 0
-        snd = 1
-        delay = 0
-        target = 0
-        Tap(delay, img, snd, target, 5)
+        posta = [ 
+            [ DELAY_0, IMG_SI, SND_NO, SEGUIR_IMG, TRIALS_BLOQUE_COMUN];
+            [ DELAY_0, IMG_NO, SND_SI, SEGUIR_SND, TRIALS_BLOQUE_COMUN];
+            [ DELAY_0, IMG_SI, SND_SI, SEGUIR_IMG, TRIALS_BLOQUE_COMUN];
+            [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+            [ DELAY_1, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+            [-DELAY_1, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+            [ DELAY_2, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+            [-DELAY_2, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+            [ DELAY_3, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+            [-DELAY_3, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+        ]
+        
+        % mezclar `posta` de alguna forma
 
-        % bloque 3
-        % el sujeto ve imagen y sonido sincronizado
-        img = 1
-        snd = 1
-        delay = 0
-        target = 1 % no importa
-        Tap(delay, img, snd, target, 5)
+        correrBloques(practica, 10)
 
-        % bloque 4
-        % el sujeto ve imagen y sonido + 0.25, sigue a la imagen
-        img = 1
-        snd = 1
-        delay = 0.25
-        target = 1
-        Tap(delay, img, snd, target, 5)
-
-        % bloque 5
-        % el sujeto ve imagen y sonido + 0.5, sigue a la imagen
-        img = 1
-        snd = 1
-        delay = 0.5
-        target = 1
-        Tap(delay, img, snd, target, 5)
-
-        % bloque 6
-        % el sujeto ve imagen y sonido + 0.75, sigue a la imagen
-        img = 1
-        snd = 1
-        delay = 0.75
-        target = 1
-        Tap(delay, img, snd, target, 5)
-
-        % bloque 7
-        % el sujeto ve imagen y sonido -0.25 , sigue al sonido
-        img = 1
-        snd = 1
-        delay = 0.25
-        target = 0
-        Tap(delay, img, snd, target, 5)
-
-        % bloque 8
-        % el sujeto ve imagen y sonido -0.5 , sigue al sonido
-        img = 1
-        snd = 1
-        delay = 0.5
-        target = 0
-        Tap(delay, img, snd, target, 5)
-
-        % bloque 9
-        % el sujeto ve imagen y sonido -0.75 , sigue al sonido
-        img = 1
-        snd = 1
-        delay = 0.75
-        target = 0
-        Tap(delay, img, snd, target, 5)
-
+        % pausa() ???
+        correrBloques(posta, 2)
 
         CleanupPTB();
+
     % This "catch" section executes in case of an error in the "try" section
     % above.  Importantly, it closes the onscreen window if it's open.
     catch
@@ -97,6 +64,22 @@ function bloques
         CleanupPTB();
     end
 
+end
+
+function correrBloques(ts, tiempo_pausa)
+
+    I_DELAY = 1;
+    I_IMG = 2;
+    I_SND = 3;
+    I_SEGUIR = 4;
+    I_TRIALS = 5;
+   
+    filas = size(ts, 1)
+    
+    for i = 1:filas
+        Tap(ts(i, I_DELAY), ts(i, I_IMG), ts(i, I_SND), ts(i, I_SEGUIR), ts(i, I_TRIALS))
+        pausaEpileptica(tiempo_pausa)
+    end
 end
 
 function InitPTB(fullscreen)
@@ -111,8 +94,9 @@ function InitPTB(fullscreen)
     global wavedata;
     global IMG_NUMBER;
     global BLACK;
+    global WHITE;
 
-
+    
     IMG_NUMBER = 4;
     SND_NUMBER = 2;
 
@@ -215,3 +199,20 @@ function CleanupPTB
     Screen('Preference', 'SuppressAllWarnings', oldSupressAllWarnings);
 end
 %%
+function pausaEpileptica(tiempo)
+    global windowHandle;
+    global BLACK;
+    global WHITE;
+
+    EPILEPSIA_INTERVAL=0.125;
+    t = tiempo/(EPILEPSIA_INTERVAL*2);
+    for i = 1:t
+        Screen('FillRect', windowHandle, BLACK)
+        Screen('Flip', windowHandle);
+        WaitSecs(EPILEPSIA_INTERVAL);
+        Screen('FillRect', windowHandle, WHITE)
+        Screen('Flip', windowHandle);
+        WaitSecs(EPILEPSIA_INTERVAL);
+    end
+    KbWait()
+end

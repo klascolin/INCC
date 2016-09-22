@@ -16,7 +16,7 @@ function Tap(delay, img, snd, target, total_trials)
     TOTAL_TRIALS = total_trials;
 
     % tiempo (regular) entre estimulos, en segundos
-    INTERVAL = 0.5;
+    INTERVAL = 0.25;
 
     % diferencia entre img y sonido, en segundos
     %    si = 0 sincronizados
@@ -134,5 +134,7 @@ function Tap(delay, img, snd, target, total_trials)
     disp('')
     disp('Showing samples obtained on this run:');
     disp(time_firstPress)
+    disp(time_firstPress-target_time)
+    score = mean(abs(time_firstPress-target_time))
 
 end
