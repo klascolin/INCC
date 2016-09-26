@@ -12,6 +12,8 @@ function Tap(delay, img, snd, target, total_trials)
     global iCenter;
     global wavedata;
 
+    global sujeto;
+
     % Parameters definitions
     TOTAL_TRIALS = total_trials;
 
@@ -109,20 +111,22 @@ function Tap(delay, img, snd, target, total_trials)
             index_pressed = find(firstPressTimes);
 
             if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
-                CleanupPTB();
                 error('Se apreto ESC, saliendo');
             end
 
             if (pressed && firstPressTimes(tapKeyCode) ~= 0) % se apreto la barra
                 % Trial valido
-            time_firstPress(TOTAL_TRIALS - remaining_trials) = firstPressTimes(tapKeyCode)
-                time_lastPress(TOTAL_TRIALS - remaining_trials) = lastPressTimes(tapKeyCode)
-
-            else % Trial invalido
-                disp(1)
-                time_firstPress(TOTAL_TRIALS - remaining_trials) = 0
-                time_lastPress(TOTAL_TRIALS - remaining_trials) = 0
+                first_press = firstPressTimes(tapKeyCode);
+                last_press = lastPressTimes(tapKeyCode);
+            else 
+                % Trial invalido
+                first_press = -1;
+                last_press = -1;
             end
+
+            time_firstPress(TOTAL_TRIALS - remaining_trials) = first_press;
+            time_lastPress(TOTAL_TRIALS - remaining_trials) = last_press;
+
             KbQueueFlush();
         end
 
@@ -130,11 +134,28 @@ function Tap(delay, img, snd, target, total_trials)
 
     end
 
-    % Show results on console
-    disp('')
-    disp('Showing samples obtained on this run:');
-    disp(time_firstPress)
-    disp(time_firstPress-target_time)
-    score = mean(abs(time_firstPress-target_time))
+    tiempo = GetSecs();
+
+    f = fopen('data/bloques.csv', 'a');
+
+    fprintf(f, '%i,', sujeto);
+    
+    fprintf(f, '%f,', tiempo);
+
+    fprintf(f, '%f,', delay);
+    fprintf(f, '%i,', img);
+    fprintf(f, '%i,', snd);
+    fprintf(f, '%i,', target);
+    fprintf(f, '%i,', total_trials);
+
+    fprintf(f, '%f:', target_time);
+    fprintf(f, ',');
+    fprintf(f, '%f:', time_firstPress);
+    fprintf(f, ',');
+    fprintf(f, '%f:', time_lastPress);
+    fprintf(f, ',');
+    fprintf(f, '\n');
+
+    fclose(f);
 
 end

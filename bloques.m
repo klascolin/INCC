@@ -1,15 +1,14 @@
 function bloques
 % MAIN
-
     format long g;
     % constantes
     USE_FULLSCREEN = 1;
     USE_WINDOWED = 0;
 
     DELAY_0 = 0;
-    DELAY_1 = 0.25/2;
-    DELAY_2 = 0.50/2;
-    DELAY_3 = 0.75/2;
+    DELAY_1 = 0.25;
+    DELAY_2 = 0.50;
+    DELAY_3 = 0.75;
 
     IMG_SI = 1;
     IMG_NO = 0;
@@ -24,7 +23,16 @@ function bloques
     TRIALS_BLOQUE_COMUN = 15;
     % /constantes
 
+    global sujeto;
     try
+        sujeto = csvread('data/siguientesujeto.csv')
+    catch
+        sujeto = 1
+    end
+    csvwrite('data/siguientesujeto.csv', sujeto+1)
+
+    try
+        PsychPortAudio('Close') % en caso de que se haya cerrado mal
         InitPTB(USE_WINDOWED)
 
         practica = [
@@ -67,7 +75,6 @@ function bloques
 end
 
 function correrBloques(ts, tiempo_pausa)
-
     I_DELAY = 1;
     I_IMG = 2;
     I_SND = 3;
@@ -180,7 +187,6 @@ function CleanupPTB
     global oldVisualDebugLevel;
     global oldSupressAllWarnings;
     global audioHandle;
-    global SND;
 
     % Stop playback:
     PsychPortAudio('Stop', audioHandle);
