@@ -1,5 +1,5 @@
 
-function Tap(delay, img, snd, target, total_trials)
+function Tap(delay, img, snd, target, total_trials, practica)
 
     global audioHandle;
     global windowHandle;
@@ -18,7 +18,7 @@ function Tap(delay, img, snd, target, total_trials)
     TOTAL_TRIALS = total_trials;
 
     % tiempo (regular) entre estimulos, en segundos
-    INTERVAL = 0.25;
+    INTERVAL = 0.50;
 
     % diferencia entre img y sonido, en segundos
     %    si = 0 sincronizados
@@ -74,8 +74,6 @@ function Tap(delay, img, snd, target, total_trials)
     while (remaining_trials > 0)
 
         Screen('FillRect', windowHandle, BLACK)
-        % Useful info for user about how to quit.
-        % Screen('DrawText', windowHandle, 'Bienvenido! Para marcar el final usa la barra espaciadora. Esc para salir', 32, 32, BLACK);
 
         if IMG && img_before_sound
             Screen('DrawTexture', windowHandle, imagetex{i}, iRect{i});
@@ -142,6 +140,7 @@ function Tap(delay, img, snd, target, total_trials)
     
     fprintf(f, '%f,', tiempo);
 
+    fprintf(f, '%i,', practica);
     fprintf(f, '%f,', delay);
     fprintf(f, '%i,', img);
     fprintf(f, '%i,', snd);

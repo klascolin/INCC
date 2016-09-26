@@ -35,18 +35,17 @@ function bloques
         PsychPortAudio('Close') % en caso de que se haya cerrado mal
         InitPTB(USE_WINDOWED)
 
+        que_seguir = mod(sujeto, 2);
+
         practica = [
             [ DELAY_0, IMG_SI, SND_NO, SEGUIR_IMG, TRIALS_BLOQUE_PRACTICA];
             [ DELAY_0, IMG_NO, SND_SI, SEGUIR_SND, TRIALS_BLOQUE_PRACTICA];
-            [ DELAY_0, IMG_SI, SND_SI, SEGUIR_IMG, TRIALS_BLOQUE_PRACTICA];
+            [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_PRACTICA];
         ]
-
-        que_seguir = SEGUIR_IMG; % elegirlo bien
-
         posta = [ 
             [ DELAY_0, IMG_SI, SND_NO, SEGUIR_IMG, TRIALS_BLOQUE_COMUN];
             [ DELAY_0, IMG_NO, SND_SI, SEGUIR_SND, TRIALS_BLOQUE_COMUN];
-            [ DELAY_0, IMG_SI, SND_SI, SEGUIR_IMG, TRIALS_BLOQUE_COMUN];
+            [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
             [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
             [ DELAY_1, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
             [-DELAY_1, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
@@ -57,11 +56,9 @@ function bloques
         ]
         
         % mezclar `posta` de alguna forma
+        correrBloques(practica, 1)
 
-        correrBloques(practica, 10)
-
-        % pausa() ???
-        correrBloques(posta, 2)
+        correrBloques(posta, 0)
 
         CleanupPTB();
 
@@ -74,7 +71,7 @@ function bloques
 
 end
 
-function correrBloques(ts, tiempo_pausa)
+function correrBloques(ts, practica)
     I_DELAY = 1;
     I_IMG = 2;
     I_SND = 3;
@@ -83,10 +80,12 @@ function correrBloques(ts, tiempo_pausa)
    
     filas = size(ts, 1)
     
+    
     for i = 1:filas
-        Tap(ts(i, I_DELAY), ts(i, I_IMG), ts(i, I_SND), ts(i, I_SEGUIR), ts(i, I_TRIALS))
-        pausaEpileptica(tiempo_pausa)
+        pausaExplicaBloque(ts(i, I_IMG), ts(i, I_SND), ts(i, I_SEGUIR), practica)
+        Tap(ts(i, I_DELAY), ts(i, I_IMG), ts(i, I_SND), ts(i, I_SEGUIR), ts(i, I_TRIALS), practica)
     end
+    
 end
 
 function InitPTB(fullscreen)
@@ -204,21 +203,61 @@ function CleanupPTB
     Screen('Preference', 'VisualDebugLevel', oldVisualDebugLevel);
     Screen('Preference', 'SuppressAllWarnings', oldSupressAllWarnings);
 end
-%%
-function pausaEpileptica(tiempo)
+
+function pausaExplicaBloque(img, snd, seguir_img, practica)
     global windowHandle;
     global BLACK;
     global WHITE;
 
-    EPILEPSIA_INTERVAL=0.125;
-    t = tiempo/(EPILEPSIA_INTERVAL*2);
-    for i = 1:t
-        Screen('FillRect', windowHandle, BLACK)
-        Screen('Flip', windowHandle);
-        WaitSecs(EPILEPSIA_INTERVAL);
-        Screen('FillRect', windowHandle, WHITE)
-        Screen('Flip', windowHandle);
-        WaitSecs(EPILEPSIA_INTERVAL);
+    Screen('FillRect', windowHandle, BLACK);
+
+    if practica
+        if img && ~snd
+            s_text = 'HOLA VAS A VER CUADRADOS DE COLORES\nAPRETA LA BARRA ESPACIADORA EN EL AMARILLO';
+        end
+
+        if ~img && snd
+            s_text = 'AHORA VAS A ESCUCHAR RUIDITOS\nAPRETA EN EL QUE SUENE DISTINTO';
+        end
+
+
+        if img && snd
+            if seguir_img
+                s_seguir = ' las imagenes';
+            else
+                s_seguir = ' los sonidos';
+            end
+
+            s_text = strcat('Ahora van a aparecer imagenes y sonidos, tenes que seguir ', s_seguir);
+        end
+
+        DrawFormattedText(windowHandle, s_text, 'center', 'center', WHITE);
+
+    else
+        s_contiene = ''
+        if img && snd
+            s_contiene = ' imagenes y sonidos';
+        end
+        if ~img && snd
+            s_contiene = ' solamente sonidos';
+        end
+        if img && ~snd
+            s_contiene = ' imagenes unicamente';
+        end
+        if seguir_img
+            s_seguir = ' la ultima imagen';
+        else
+            s_seguir = ' el ultimo sonido';
+        end
+        DrawFormattedText(windowHandle, strcat( ...
+            'El siguiente bloque contiene', s_contiene, '\n', ...
+            'El objetivo es apretar la barra en', s_seguir, '\n', ...
+            'Apreta la barra cuando quieras empezar con el bloque.', '\n' ...
+        ), 'center', 'center', WHITE);
     end
-    KbWait()
+    Screen('Flip', windowHandle);
+
+    WaitSecs(2);
+
+    KbWait();
 end
