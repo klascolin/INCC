@@ -111,7 +111,7 @@ function Tap(delay, img, snd, target, total_trials, practica)
             if pressed && firstPressTimes(quitKeyCode) % alguna de las teclas apretadas fue la de salir
                 fprintf('Se apreto ESC, saliendo');
                 CleanupPTB();
-                error();
+                error('saliendo');
             end
 
             if (pressed && firstPressTimes(tapKeyCode) ~= 0) % se apreto la barra
