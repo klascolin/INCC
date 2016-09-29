@@ -149,7 +149,7 @@ function InitPTB(fullscreen)
     iRect = cell(1, IMG_NUMBER);
     iCenter = cell(1, IMG_NUMBER);
     for i = 1:IMG_NUMBER
-        imdata{i} = imread(['col' sprintf('%d', i) '.jpg']);
+        imdata{i} = imread(['col' sprintf('%d', i) '.png']);
         imagetex{i} = Screen('MakeTexture', windowHandle, imdata{i});
         iRect{i} = Screen('Rect', imagetex{i});
         [cx, cy] = RectCenter(iRect{i});
