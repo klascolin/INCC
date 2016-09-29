@@ -190,22 +190,22 @@ function pausaExplicaBloque(img, snd, seguir_img, practica)
 
     if practica
         if img && ~snd
-            s_text = 'HOLA VAS A VER CUADRADOS DE COLORES\nAPRETA LA BARRA ESPACIADORA EN EL AMARILLO';
+            s_text = 'A continuación van a aparecer cuadrantes de diferentes colores. \n Debes apretar la barra espaciadora cada vez que veas el cuadrante amarillo';
         end
 
         if ~img && snd
-            s_text = 'AHORA VAS A ESCUCHAR RUIDITOS\nAPRETA EN EL QUE SUENE DISTINTO';
+            s_text ='A continuación vas a escuchar grupos de 4 tonos separados entre si \n. Estos tonos se van a repetir varias veces. Presta atencion y apreta la barra espaciadora cada vez que escuches el tono diferente'
         end
 
 
         if img && snd
             if seguir_img
-                s_seguir = ' las imagenes';
+                s_seguir = ' el cuadrante amarillo';
             else
-                s_seguir = ' los sonidos';
+                s_seguir = ' el sonido diferente ';
             end
 
-            s_text = strcat('Ahora van a aparecer imagenes y sonidos, tenes que seguir ', s_seguir);
+            s_text = strcat('Ahora van a aparecer tanto las imagenes como los tonos. \n Debes apretar la barra espaciadora cada vez que aparezca ', s_seguir);
         end
 
         DrawFormattedText(windowHandle, s_text, 'center', 'center', WHITE);
@@ -222,13 +222,13 @@ function pausaExplicaBloque(img, snd, seguir_img, practica)
             s_contiene = ' imagenes unicamente';
         end
         if seguir_img
-            s_seguir = ' la ultima imagen';
+            s_seguir = ' la imagen amarilla';
         else
-            s_seguir = ' el ultimo sonido';
+            s_seguir = ' el sonido diferente';
         end
         DrawFormattedText(windowHandle, strcat( ...
             'El siguiente bloque contiene', s_contiene, '\n', ...
-            'El objetivo es apretar la barra en', s_seguir, '\n', ...
+            'Debes apretar la barra en', s_seguir, '\n', ...
             'Apreta la barra cuando quieras empezar con el bloque.', '\n' ...
         ), 'center', 'center', WHITE);
     end
