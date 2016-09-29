@@ -7,8 +7,8 @@ function bloques
 
     DELAY_0 = 0;
     DELAY_1 = 0.10;
-    DELAY_2 = 0.20;
-    DELAY_3 = 0.30;
+    DELAY_2 = 0.30;
+    DELAY_3 = 0.40;
 
     IMG_SI = 1;
     IMG_NO = 0;
@@ -20,7 +20,7 @@ function bloques
     SEGUIR_SND = 0;
 
     TRIALS_BLOQUE_PRACTICA = 5;
-    TRIALS_BLOQUE_COMUN = 15;
+    TRIALS_BLOQUE_COMUN = 10;
     % /constantes
 
     global sujeto;
@@ -235,7 +235,7 @@ function pausaExplicaBloque(img, snd, seguir_img, practica)
         ), 'center', 'center', WHITE);
     end
     Screen('Flip', windowHandle);
-
+    WaitSecs(1);
     KbWait();
 end
 
@@ -249,6 +249,6 @@ function mensajeFin()
 
     DrawFormattedText(windowHandle, 'Listo. Gracias!', 'center', 'center', WHITE);
     Screen('Flip', windowHandle);
-
+    WaitSecs(1);
     KbWait();
 end

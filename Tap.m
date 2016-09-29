@@ -18,7 +18,7 @@ function Tap(delay, img, snd, target, total_trials, practica)
     TOTAL_TRIALS = total_trials;
 
     % tiempo (regular) entre estimulos, en segundos
-    INTERVAL = 0.3;
+    INTERVAL = 0.5;
 
     % diferencia entre img y sonido, en segundos
     %    si = 0 sincronizados
