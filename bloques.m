@@ -257,7 +257,5 @@ function pausaExplicaBloque(img, snd, seguir_img, practica)
     end
     Screen('Flip', windowHandle);
 
-    WaitSecs(2);
-
     KbWait();
 end
