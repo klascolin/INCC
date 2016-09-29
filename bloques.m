@@ -6,9 +6,9 @@ function bloques
     USE_WINDOWED = 0;
 
     DELAY_0 = 0;
-    DELAY_1 = 0.25;
-    DELAY_2 = 0.50;
-    DELAY_3 = 0.75;
+    DELAY_1 = 0.10;
+    DELAY_2 = 0.20;
+    DELAY_3 = 0.30;
 
     IMG_SI = 1;
     IMG_NO = 0;
