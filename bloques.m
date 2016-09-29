@@ -55,11 +55,13 @@ function bloques
             [-DELAY_3, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
         ]
         
-        % mezclar `posta` de alguna forma
+        postaMezclada = posta(randperm(size(posta,1)),:);
+
         correrBloques(practica, 1)
 
-        correrBloques(posta, 0)
+        correrBloques(postaMezclada, 0)
 
+        mensajeFin();
         CleanupPTB();
 
     % This "catch" section executes in case of an error in the "try" section
@@ -232,6 +234,20 @@ function pausaExplicaBloque(img, snd, seguir_img, practica)
             'Apreta la barra cuando quieras empezar con el bloque.', '\n' ...
         ), 'center', 'center', WHITE);
     end
+    Screen('Flip', windowHandle);
+
+    KbWait();
+end
+
+
+function mensajeFin()
+    global windowHandle;
+    global BLACK;
+    global WHITE;
+
+    Screen('FillRect', windowHandle, BLACK);
+
+    DrawFormattedText(windowHandle, 'Listo. Gracias!', 'center', 'center', WHITE);
     Screen('Flip', windowHandle);
 
     KbWait();
