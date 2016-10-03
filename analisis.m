@@ -1,6 +1,5 @@
 format long g;
 
-f = fopen('data/bloques.csv');
 i = 0;
 sujeto = [];
 tiempo = [];
@@ -13,13 +12,14 @@ total_trials = [];
 target_time = cell(1,1);
 time_firstPress = cell(1,1);
 time_lastPress = cell(1,1);
-
+time_delta = cell(1,1);
+f = fopen('data/bloques.csv');
 while 1    
-    i = i + 1;
     suj = fscanf(f, '%i,', [1 1]);
     if isempty(suj)
        break 
     end
+    i = i + 1;
     
     sujeto(i) = suj;
     tiempo(i) = fscanf(f, '%f,', [1 1]);
@@ -36,8 +36,22 @@ while 1
     time_lastPress{i} = fscanf(f, '%f:', [1 total_trials(i)]);
     fscanf(f, ',');
     fscanf(f, '\n');
-    
-    
 end
-
 fclose(f);
+
+num_bloques = i;
+
+n_invalidos = 0;
+for i = 1 : num_bloques
+   
+   invalidos = find(time_firstPress{i} == -1);
+   n_invalidos = n_invalidos + length(invalidos);
+  
+   target_time{i}(invalidos) = [];
+   time_firstPress{i}(invalidos) = [];
+   time_lastPress{i}(invalidos) = [];
+   time_delta{i} = time_firstPress{i} - target_time{i};
+   
+   disp(mean(time_delta{i}))
+end
+disp(n_invalidos)
