@@ -105,11 +105,17 @@ for s = 1001 : 1010
         end
         ultimo_nbo = nbo;
 	    deltas(j) = delta_bloque(nbo);
+        if delta_bloque(nbo) < - 0.2
+            disp('pifie feo aca')
+            disp(Trials(i).Delay)
+            disp(Trials(i).SeguirImagen)
+            disp(Trials(i).HayImagen)
+            disp(Trials(i).HaySonido)
+        end
         j = j + 1;
 	end
     if ~isempty(deltas)
         figure;
         plot(deltas);
     end
-	clear i j deltas
 end
