@@ -87,18 +87,10 @@ k = 0;
 asinc = 0;
 unbo = Trials(1).NumBloqueOriginal;
 while t <= (num_trials + 1)
-    fin = 0;
-    if (t == (num_trials + 1)) 
-        fin = 1;
-    else
-        if (unbo ~= Trials(t).NumBloqueOriginal)
-            fin = 1;
-        end
-    end 
-    if fin
-        if k == 0 % todos los trials del bloque fueron ignorados totalmente
-            % viva peron
-        else
+
+    if t == (num_trials + 1) || unbo ~= Trials(t).NumBloqueOriginal
+
+        if k ~=0 
             Muestras(m).AsinMedia = asinc / k;
             Muestras(m).Sujeto = Trials(t-1).Sujeto;
             Muestras(m).EsDePractica = Trials(t-1).EsDePractica;
@@ -106,6 +98,8 @@ while t <= (num_trials + 1)
             Muestras(m).HayImagen = Trials(t-1).HayImagen;
             Muestras(m).HaySonido = Trials(t-1).HaySonido;
             Muestras(m).SeguirImagen = Trials(t-1).SeguirImagen;
+            Muestras(m).Accuracy = 1 - (ignorados/(k+ignorados));
+
 
             m = m + 1;
         end
@@ -117,19 +111,19 @@ while t <= (num_trials + 1)
         end
     end
     
-    ignorar = 0;
+    ignorados = 0;
     % ignorar cuando no apreto nada
     if Trials(t).PrimerTap == -1
-        ignorar = 1;
+        ignorados = ignorados + 1;
     end
     
     % ignorar casos donde pega la vuelta (igual estan re afuera de la ventana)
-    if Trials(t).Asincronia < -1
-        ignorar = 1;
+    if Trials(t).Asincronia < -0.5
+        ignorados = ignorados + 1;
     end
     
     
-    if ~ignorar
+    if ignorados == 0
         asinc = asinc + Trials(t).Asincronia;
         k = k + 1;
     end
@@ -143,6 +137,8 @@ mi=1;
 ms=1;
 deltas_img = [];
 deltas_snd = [];
+accuracy_snd = [];
+accuracy_img = [];
 
 sujs = unique([Muestras.Sujeto]);
 for s = 1:numel(sujs)
@@ -157,8 +153,17 @@ for s = 1:numel(sujs)
         [Muestras.HaySonido] == 1 ...
     ).AsinMedia];
 
+    accuracy = [Muestras( ...
+        [Muestras.Sujeto] == suj & ...
+        [Muestras.EsDePractica] == 0 & ...
+        [Muestras.HayImagen] == 0 & ...
+        [Muestras.HaySonido] == 1 ...
+    ).Accuracy];
+
+
     if numel(delta_snd) > 0
         deltas_snd(ms) = delta_snd(1);
+        accuracy_snd(ms) = accuracy;
         ms = ms + 1;
     end
     
@@ -169,8 +174,17 @@ for s = 1:numel(sujs)
         [Muestras.HaySonido] == 0 ...
     ).AsinMedia];
 
+    accuracy = [Muestras( ...
+        [Muestras.Sujeto] == suj & ...
+        [Muestras.EsDePractica] == 0 & ...
+        [Muestras.HayImagen] == 1 & ...
+        [Muestras.HaySonido] == 0 ...
+    ).Accuracy];
+
+
     if numel(delta_img) > 0
         deltas_img(mi) = delta_img(1);
+        accuracy_img(ms) = accuracy;
         mi = mi + 1;
     end
     
@@ -185,7 +199,14 @@ end
 %Mostrar el promedio de todos los sujetos con solo imagen y con solo sonido
 mean(deltas_snd)
 mean(deltas_img)
+boxplot(deltas_snd)
+xlabel('All Vehicles')
+ylabel('Miles per Gallon (MPG)')
+title('Miles per Gallon for All Vehicles')
+
+mean(accuracy_snd)
+mean(accuracy_img)
 var(deltas_snd)
 var(deltas_img)
 
-[p,h] = ranksum(deltas_snd,deltas_img)
+%[p,h] = ranksum(deltas_snd,deltas_img)
