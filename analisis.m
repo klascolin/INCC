@@ -1,5 +1,20 @@
 format long g;
 
+function y =  Permutation_Test(prms,sample1,sample2,h0)
+  exitos = 0;
+  p = [sample1,sample2];
+  for j = 1:prms
+    a = p(randperm(numel(sample1)+numel(sample2)));
+    set1 = a(1:numel(sample1));
+    set2 = a(numel(sample1)+1:numel(p));
+    abs(mean(set2)-mean(set1));
+    exitos = exitos + (h0 < abs(mean(set1)-mean(set2)));
+  end
+
+  y = exitos / prms;
+
+end
+
 %% Leer CSV a variables aux
 i = 0;
 sujeto = [];
@@ -210,11 +225,11 @@ bar(x,f/sum(f))
 
 
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-t = kstest(deltas_snd)
+%t = kstest(deltas_snd)
 
 %Boxplot
 figure;
-boxplot(deltas_snd)
+%boxplot(deltas_snd)
 title('Boxplot tiempos de respuesta solo sonido')
 
 %Medidas de centralidad
@@ -239,11 +254,11 @@ bar(x,f/sum(f))
 
 %Boxplot
 figure;
-boxplot(deltas_img)
+%boxplot(deltas_img)
 title('Boxplot tiempos de respuesta solo imagen')
 
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-h = kstest(deltas_img)
+%h = kstest(deltas_img)
 
 %Medidas de centralidad
 disp('prom')
@@ -257,5 +272,12 @@ var(deltas_img)
 mean(accuracy_img)
 
 
+
+delta_h0 =  abs(mean(deltas_snd) - mean(deltas_img))
+
+Permutation_Test(1000,deltas_snd,deltas_img,delta_h0)
+
+
+
 %Comparacion de los resultados:
-[p,h] = ranksum(deltas_snd,deltas_img)
+%	[p,h] = ranksum(deltas_snd,deltas_img)
