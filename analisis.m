@@ -196,17 +196,66 @@ for s = 1:numel(sujs)
     end
 end
 
-%Mostrar el promedio de todos los sujetos con solo imagen y con solo sonido
-mean(deltas_snd)
-mean(deltas_img)
-boxplot(deltas_snd)
-xlabel('All Vehicles')
-ylabel('Miles per Gallon (MPG)')
-title('Miles per Gallon for All Vehicles')
+%Analisis de datos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Solo Sonido:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-mean(accuracy_snd)
-mean(accuracy_img)
+%Distribucion de las muestras(histograma normalizado)
+
+[f,x] = hist(deltas_snd);
+figure;
+bar(x,f/sum(f))
+
+
+
+%One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
+t = kstest(deltas_snd)
+
+%Boxplot
+figure;
+boxplot(deltas_snd)
+title('Boxplot tiempos de respuesta solo sonido')
+
+%Medidas de centralidad
+disp('prom')
+mean(deltas_snd)
+median(deltas_snd)
+
+%Medidas de dispersion, estabilidad de la sincronia
 var(deltas_snd)
+
+%Medidas de precision en la tarea
+mean(accuracy_snd)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Solo imagen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Distribucion de las muestras(histograma normalizado)
+[f,x] = hist(deltas_img);
+figure;
+bar(x,f/sum(f))
+
+
+%Boxplot
+figure;
+boxplot(deltas_img)
+title('Boxplot tiempos de respuesta solo imagen')
+
+%One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
+h = kstest(deltas_img)
+
+%Medidas de centralidad
+disp('prom')
+mean(deltas_img)
+median(deltas_img)
+
+%Medidas de dispersion, estabilidad de la sincronia
 var(deltas_img)
 
-%[p,h] = ranksum(deltas_snd,deltas_img)
+%Medidas de precision en la tarea
+mean(accuracy_img)
+
+
+%Comparacion de los resultados:
+[p,h] = ranksum(deltas_snd,deltas_img)
