@@ -60,7 +60,7 @@ function Tap(delay, img, snd, target, total_trials, practica)
     remaining_trials = TOTAL_TRIALS;
 
     img_before_sound = DELAY > 0;
-    abs_delay = abs(DELAY);
+    delay = abs(DELAY);
 
     KbQueueCreate();
     KbQueueStart();
@@ -79,7 +79,7 @@ function Tap(delay, img, snd, target, total_trials, practica)
             Screen('DrawTexture', windowHandle, imagetex{i}, iRect{i});
             Screen('Flip', windowHandle);
             img_time = GetSecs();
-            WaitSecs(abs_delay);
+            WaitSecs(delay);
         end
         if SND
             PsychPortAudio('FillBuffer', audioHandle, wavedata{1 + (i == IMG_NUMBER)});
@@ -87,14 +87,14 @@ function Tap(delay, img, snd, target, total_trials, practica)
             snd_time = GetSecs();
         end
         if IMG && ~img_before_sound
-            WaitSecs(abs_delay);
+            WaitSecs(delay);
             Screen('DrawTexture', windowHandle, imagetex{i}, iRect{i});
             Screen('Flip', windowHandle);
             img_time = GetSecs();
         end
 
 
-        WaitSecs(INTERVAL - abs_delay);
+        WaitSecs(INTERVAL - delay);
 
         if i == IMG_NUMBER
             % Ya se mostro la imagen final.
@@ -118,7 +118,7 @@ function Tap(delay, img, snd, target, total_trials, practica)
                 % Trial valido
                 first_press = firstPressTimes(tapKeyCode);
                 last_press = lastPressTimes(tapKeyCode);
-            else
+            else 
                 % Trial invalido
                 first_press = -1;
                 last_press = -1;
@@ -139,7 +139,7 @@ function Tap(delay, img, snd, target, total_trials, practica)
     f = fopen('data/bloques.csv', 'a');
 
     fprintf(f, '%i,', sujeto);
-
+    
     fprintf(f, '%f,', tiempo);
 
     fprintf(f, '%i,', practica);
