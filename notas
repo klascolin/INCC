@@ -14,3 +14,11 @@ bloques
 
 1. 9 condiciones permut
 2. 9 condiciones permut
+
+-----------------------------------------------------------------
+Analisis:
+
+-Histograma de las muestras
+-Box plot
+-Desvio estandar--> estabilidad en la sincro.
+-Medida de asincronia(diferencia entre target y respuesta)

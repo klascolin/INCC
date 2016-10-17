@@ -76,10 +76,11 @@ end
 
 num_trials = j-1;
 
+
+
 clear sujeto tiempo practica delay img snd target bloque_del_sujeto total_trials target_time time_firstPress time_lastPress f b i j k s num_bloques suj
 
-
-%% calcular muestras (promedio de cada bloque) ignorando datos fuera de la ventana y etc
+%% calcular muestras (promedio de cada bloque)
 Muestras = [];
 t = 1;
 m = 1;
@@ -91,6 +92,7 @@ while t <= (num_trials + 1)
     if t == (num_trials + 1) || unbo ~= Trials(t).NumBloqueOriginal
 
         if k ~=0 
+            
             Muestras(m).AsinMedia = asinc / k;
             Muestras(m).Sujeto = Trials(t-1).Sujeto;
             Muestras(m).EsDePractica = Trials(t-1).EsDePractica;
@@ -100,7 +102,10 @@ while t <= (num_trials + 1)
             Muestras(m).SeguirImagen = Trials(t-1).SeguirImagen;
             Muestras(m).Accuracy = 1 - (ignorados/(k+ignorados));
 
-
+            
+            Muestras(m).Tiempo = Trials(t-1).Tiempo;
+            Muestras(m).TiempoObjetivo = Trials(t-1).TiempoObjetivo;
+            Muestras(m).NumBloqueOriginal = Trials(t-1).NumBloqueOriginal;
             m = m + 1;
         end
         
@@ -131,6 +136,76 @@ while t <= (num_trials + 1)
     unbo = Trials(t).NumBloqueOriginal;
     t = t + 1;
 end
+
+%% RECONSTRUYENDO LOS SIGNOS DEL DELAY
+
+ds = [0.1, 0.3, 0.4];
+
+corte = [];
+es_negativo = [];
+es_positivo = [];
+es_practica = [];
+
+for segu = 1:2
+    for iid = 1:3
+        eee = [Muestras( ...
+                [Muestras.EsDePractica] == 0 & ...
+                [Muestras.Delay] == ds(iid) & ...
+                [Muestras.SeguirImagen] == (segu-1) & ...
+                [Muestras.HayImagen] == 1 & ...
+                [Muestras.HaySonido] == 1)];
+            
+        jose = [];
+        for e = 1: numel(eee)
+            jose(e) = [0.5 - (eee(e).Tiempo - eee(e).TiempoObjetivo)];
+        end
+
+        m = mean(jose);
+        d = ds(iid);
+        s = (segu-1);
+        %disp([m, d, s]);
+        corte(iid, segu) = m;
+        
+        for i = 1:numel(Muestras)
+            es_practica(Muestras(i).NumBloqueOriginal) = Muestras(i).EsDePractica;
+            
+            if Muestras(i).Delay == ds(iid) && Muestras(i).SeguirImagen == (segu-1)
+                delay_es_negativo = ( ...
+                    (Muestras(i).EsDePractica == 0) & ...
+                    (Muestras(i).Delay == ds(iid)) & ...
+                    (Muestras(i).SeguirImagen == (segu-1)) & ...
+                    (Muestras(i).HayImagen == 1) & ...
+                    (Muestras(i).HaySonido == 1) & ...
+                    ((0.5 - (Muestras(i).Tiempo - Muestras(i).TiempoObjetivo) > corte(iid, segu)) ~= Muestras(i).SeguirImagen) ...
+                );
+
+                delay_es_positivo = ( ...
+                    (Muestras(i).EsDePractica == 0) & ...
+                    (Muestras(i).Delay == ds(iid)) & ...
+                    (Muestras(i).SeguirImagen == (segu-1)) & ...
+                    (Muestras(i).HayImagen == 1) & ...
+                    (Muestras(i).HaySonido == 1) & ...
+                    ((0.5 - (Muestras(i).Tiempo - Muestras(i).TiempoObjetivo) > corte(iid, segu)) == Muestras(i).SeguirImagen) ...
+                );
+
+                es_negativo(Muestras(i).NumBloqueOriginal) = delay_es_negativo;
+                es_positivo(Muestras(i).NumBloqueOriginal) = delay_es_positivo;
+            end
+        end
+    end
+end
+
+
+% arreglar
+for i = 1:numel(Muestras)
+    b = Muestras(i).NumBloqueOriginal;
+    
+    if es_negativo(b)
+        Muestras(i).Delay = -1 * Muestras(i).Delay;
+    end
+end
+
+
 
 %% cuentitas cuentitas
 mi=1;

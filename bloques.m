@@ -45,8 +45,8 @@ function bloques
         posta = [ 
             [ DELAY_0, IMG_SI, SND_NO, SEGUIR_IMG, TRIALS_BLOQUE_COMUN];
             [ DELAY_0, IMG_NO, SND_SI, SEGUIR_SND, TRIALS_BLOQUE_COMUN];
-            [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
-            [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
+            [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN]; %% DUPLICADIN 1
+            [ DELAY_0, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN]; %%              DUPLICADIN 2
             [ DELAY_1, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
             [-DELAY_1, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
             [ DELAY_2, IMG_SI, SND_SI, que_seguir, TRIALS_BLOQUE_COMUN];
@@ -134,8 +134,10 @@ function InitPTB(fullscreen)
     WHITE = WhiteIndex(screenNumber);
     BLACK = BlackIndex(screenNumber);
     
-    sw = Screen('Resolution', 0).width;
-    sh = Screen('Resolution', 0).height;
+    sw = get(0,'ScreenSize');
+    sw = sw(3)
+    sh = get(0,'ScreenSize');
+    sh = sh(4)
     MARGEN = 100;
     % Open a double buffered (maybe fullscreen)
     if FULLSCREEN
