@@ -1,18 +1,5 @@
 format long g;
 
-% function y =  Permutation_Test(prms,sample1,sample2,h0)
-%   exitos = 0;
-%   p = [sample1,sample2];
-%   for j = 1:prms
-%     a = p(randperm(numel(sample1)+numel(sample2)));
-%     set1 = a(1:numel(sample1));
-%     set2 = a(numel(sample1)+1:numel(p));
-%     abs(mean(set2)-mean(set1));
-%     exitos = exitos + (h0 < abs(mean(set1)-mean(set2)));
-%   end
-%   y = exitos / prms;
-% end
-
 %% Leer CSV a variables aux
 i = 0;
 sujeto = [];
@@ -26,7 +13,7 @@ total_trials = [];
 target_time = cell(1,1);
 time_firstPress = cell(1,1);
 time_lastPress = cell(1,1);
-f = fopen('data/bloques.csv');
+f = fopen('data/bloques_delay_sin_signo.csv');
 
 while 1    
     suj = fscanf(f, '%i,', [1 1]);
@@ -235,13 +222,14 @@ for s = 1:numel(sujs)
         mc0 = mc0 + 1;
     end
     
-     %bloques combinados +0.1 y su accuracy
+     %bloques combinados +0.1 y su accuracy(seguir Imagen)
      delta_c0 = [Muestras( ...
         [Muestras.Sujeto] == suj & ...
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == 0.1 ...
+        [Muestras.Delay] == 0.1 & ...
+        [Muestras.SeguirImagen] == 1 ...
     ).AsinMedia];
 
     accuracy = [Muestras( ...
@@ -249,7 +237,8 @@ for s = 1:numel(sujs)
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == 0.1 ...
+        [Muestras.Delay] == 0.1 & ...
+        [Muestras.SeguirImagen] == 1 ...
     ).Accuracy];
 
 
@@ -259,13 +248,14 @@ for s = 1:numel(sujs)
         mc1 = mc1 + 1;
     end
     
-     %bloques combinados +0.3 y su accuracy
+     %bloques combinados +0.3 y su accuracy(seguir imagen)
      delta_c0 = [Muestras( ...
         [Muestras.Sujeto] == suj & ...
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == 0.3 ...
+        [Muestras.Delay] == 0.3 & ...
+        [Muestras.SeguirImagen] == 1 ...
     ).AsinMedia];
 
     accuracy = [Muestras( ...
@@ -273,7 +263,8 @@ for s = 1:numel(sujs)
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == 0.3 ...
+        [Muestras.Delay] == 0.3 & ... 
+        [Muestras.SeguirImagen] == 1 ...
     ).Accuracy];
 
 
@@ -283,13 +274,14 @@ for s = 1:numel(sujs)
         mc2 = mc2 + 1;
     end
     
-     %bloques combinados +0.4 y su accuracy
+     %bloques combinados +0.4 y su accuracy(seguir imagen)
      delta_c0 = [Muestras( ...
         [Muestras.Sujeto] == suj & ...
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == 0.4 ...
+        [Muestras.Delay] == 0.4 & ...
+        [Muestras.SeguirImagen] == 1 ...
     ).AsinMedia];
 
     accuracy = [Muestras( ...
@@ -297,7 +289,8 @@ for s = 1:numel(sujs)
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == 0.4 ...
+        [Muestras.Delay] == 0.4 & ...
+        [Muestras.SeguirImagen] == 1 ...
     ).Accuracy];
 
 
@@ -307,13 +300,15 @@ for s = 1:numel(sujs)
         mc3 = mc3 + 1;
     end
     
-    %bloques combinados -0.4 y su accuracy
+    
+     %bloques combinados +0.4 y su accuracy(seguir sonido)
      delta_c0 = [Muestras( ...
         [Muestras.Sujeto] == suj & ...
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == -0.4 ...
+        [Muestras.Delay] == 0.4 & ...
+        [Muestras.SeguirImagen] == 0 ...
     ).AsinMedia];
 
     accuracy = [Muestras( ...
@@ -321,24 +316,27 @@ for s = 1:numel(sujs)
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == -0.4 ...
+        [Muestras.Delay] == 0.4 & ...
+        [Muestras.SeguirImagen] == 0 ...
     ).Accuracy];
 
 
     if numel(delta_c0) > 0
-        disp('hola0')
         deltas{7}(mc4) = delta_c0(1);
         m_accuracy{7}(mc4) = accuracy(1);
         mc4 = mc4 + 1;
     end
     
-    %bloques combinados -0.3 y su accuracy
+    
+    
+     %bloques combinados +0.3 y su accuracy(seguir sonido)
      delta_c0 = [Muestras( ...
         [Muestras.Sujeto] == suj & ...
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == -0.3 ...
+        [Muestras.Delay] == 0.3 & ...
+        [Muestras.SeguirImagen] == 0 ...
     ).AsinMedia];
 
     accuracy = [Muestras( ...
@@ -346,7 +344,8 @@ for s = 1:numel(sujs)
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == -0.3 ...
+        [Muestras.Delay] == 0.3 & ...
+        [Muestras.SeguirImagen] == 0 ...
     ).Accuracy];
 
 
@@ -356,13 +355,16 @@ for s = 1:numel(sujs)
         mc5 = mc5 + 1;
     end
     
-    %bloques combinados -0.1 y su accuracy
+    
+    
+     %bloques combinados +0.1 y su accuracy(seguir sonido)
      delta_c0 = [Muestras( ...
         [Muestras.Sujeto] == suj & ...
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == -0.1 ...
+        [Muestras.Delay] == 0.1 & ...
+        [Muestras.SeguirImagen] == 0 ...
     ).AsinMedia];
 
     accuracy = [Muestras( ...
@@ -370,7 +372,8 @@ for s = 1:numel(sujs)
         [Muestras.EsDePractica] == 0 & ...
         [Muestras.HayImagen] == 1 & ...
         [Muestras.HaySonido] == 1 & ...
-        [Muestras.Delay] == -0.1 ...
+        [Muestras.Delay] == 0.1 & ...
+        [Muestras.SeguirImagen] == 0 ...
     ).Accuracy];
 
 
@@ -380,6 +383,81 @@ for s = 1:numel(sujs)
         mc6 = mc6 + 1;
     end
     
+    
+%     CAMBIAR INDICES!    
+%     %bloques combinados -0.4 y su accuracy
+%      delta_c0 = [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == -0.4 ...
+%     ).AsinMedia];
+% 
+%     accuracy = [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == -0.4 ...
+%     ).Accuracy];
+% 
+% 
+%     if numel(delta_c0) > 0
+%         disp('hola0')
+%         deltas{7}(mc4) = delta_c0(1);
+%         m_accuracy{7}(mc4) = accuracy(1);
+%         mc4 = mc4 + 1;
+%     end
+%     
+%     %bloques combinados -0.3 y su accuracy
+%      delta_c0 = [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == -0.3 ...
+%     ).AsinMedia];
+% 
+%     accuracy = [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == -0.3 ...
+%     ).Accuracy];
+% 
+% 
+%     if numel(delta_c0) > 0
+%         deltas{8}(mc5) = delta_c0(1);
+%         m_accuracy{8}(mc5) = accuracy(1);
+%         mc5 = mc5 + 1;
+%     end
+%     
+%     %bloques combinados -0.1 y su accuracy
+%      delta_c0 = [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == -0.1 ...
+%     ).AsinMedia];
+% 
+%     accuracy = [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == -0.1 ...
+%     ).Accuracy];
+% 
+% 
+%     if numel(delta_c0) > 0
+%         deltas{9}(mc6) = delta_c0(1);
+%         m_accuracy{9}(mc6) = accuracy(1);
+%         mc6 = mc6 + 1;
+%     end
+%     
     if ~isempty(deltas) 
         % figure;
         % plot(deltas,'r*');
@@ -398,6 +476,7 @@ end
 [f,x] = hist(deltas{1});
 figure;
 bar(x,f/sum(f))
+title('Solo Sonido')
 
 
 
@@ -427,7 +506,7 @@ mean(m_accuracy{1})
 [f,x] = hist(deltas{2});
 figure;
 bar(x,f/sum(f))
-
+title('Solo imagen')
 %Boxplot
 figure;
 boxplot(deltas{2})
@@ -457,6 +536,7 @@ mean(m_accuracy{2})
 [f,x] = hist(deltas{3});
 figure;
 bar(x,f/sum(f))
+title('Delay +0')
 
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
 %t = kstest(deltas{3})
@@ -464,7 +544,7 @@ bar(x,f/sum(f))
 %Boxplot
 figure;
 boxplot(deltas{3})
-title('Boxplot tiempos de respuesta solo sonido')
+title('Boxplot tiempos de respuesta Delay +0')
 
 %Medidas de centralidad
 disp('prom')
@@ -486,14 +566,14 @@ mean(m_accuracy{3})
 [f,x] = hist(deltas{4});
 figure;
 bar(x,f/sum(f))
-
+title('Delay + 0.1 target image')
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
 %t = kstest(deltas{4})
 
 %Boxplot
 figure;
 boxplot(deltas{4})
-title('Boxplot tiempos de respuesta solo sonido')
+title('Boxplot tiempos de respuesta Delay +0.1 target image')
 
 %Medidas de centralidad
 disp('prom')
@@ -518,14 +598,14 @@ mean(m_accuracy{4})
 [f,x] = hist(deltas{5});
 figure;
 bar(x,f/sum(f))
-
+title('Delay + 0.3 target image')
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
 %t = kstest(deltas{5})
 
 %Boxplot
 figure;
 boxplot(deltas{5})
-title('Boxplot tiempos de respuesta solo sonido')
+title('Boxplot tiempos de respuesta Delay 0+.3 target image')
 
 %Medidas de centralidad
 disp('prom')
@@ -549,14 +629,14 @@ mean(m_accuracy{5})
 [f,x] = hist(deltas{6});
 figure;
 bar(x,f/sum(f))
-
+title('Delay + 0.4 target image')
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-%t = kstest(deltas{6})
+t = kstest(deltas{6})
 
 %Boxplot
 figure;
 boxplot(deltas{6})
-title('Boxplot tiempos de respuesta solo sonido')
+title('Boxplot tiempos de respuesta Delay +0.4 target image')
 
 %Medidas de centralidad
 disp('prom')
@@ -571,7 +651,7 @@ mean(m_accuracy{6})
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Combinado -0.4:    
+%Combinado +0.4 target sound:    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Distribucion de las muestras(histograma normalizado)
@@ -579,14 +659,14 @@ mean(m_accuracy{6})
 [f,x] = hist(deltas{7});
 figure;
 bar(x,f/sum(f))
-
+title('Delay + 0.4 target sound')
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-%t = kstest(deltas{7})
+t = kstest(deltas{7})
 
 %Boxplot
 figure;
 boxplot(deltas{7})
-title('Boxplot tiempos de respuesta solo sonido')
+title('Boxplot tiempos de respuesta Delay +0.4 target sound')
 
 %Medidas de centralidad
 disp('prom')
@@ -601,7 +681,7 @@ mean(m_accuracy{7})
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Combinado -0.3:
+%Combinado +0.3 target sound:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Distribucion de las muestras(histograma normalizado)
@@ -609,14 +689,15 @@ mean(m_accuracy{7})
 [f,x] = hist(deltas{8});
 figure;
 bar(x,f/sum(f))
+title('Delay + 0.3 target sound')
 
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-%t = kstest(deltas{8})
+t = kstest(deltas{8})
 
 %Boxplot
 figure;
 boxplot(deltas{8})
-title('Boxplot tiempos de respuesta solo sonido')
+title('Boxplot tiempos de respuesta Delay +0.3 target sound')
 
 %Medidas de centralidad
 disp('prom')
@@ -630,7 +711,7 @@ var(deltas{8})
 mean(m_accuracy{8})
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Combinado -0.1:
+%Combinado +0.1 target sound:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Distribucion de las muestras(histograma normalizado)
@@ -638,14 +719,15 @@ mean(m_accuracy{8})
 [f,x] = hist(deltas{9});
 figure;
 bar(x,f/sum(f))
+title('Delay + 0.1 target sound')
 
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-%t = kstest(deltas{9})
+t = kstest(deltas{9})
 
 %Boxplot
 figure;
 boxplot(deltas{9})
-title('Boxplot tiempos de respuesta solo sonido')
+title('Boxplot tiempos de respuesta Delay +0.1 target sonido')
 
 %Medidas de centralidad
 disp('prom')
@@ -667,5 +749,5 @@ mean(m_accuracy{9})
 
 delta_h0 =  abs(mean(deltas{1}) - mean(deltas{2}))
 
-%Permutation_Test(1000,deltas{1},deltas{2},delta_h0)
+Permutation_Test(1000,deltas{1},deltas{2},delta_h0)
 
