@@ -133,12 +133,16 @@ function InitPTB(fullscreen)
     screenNumber = max(Screen('Screens'));
     WHITE = WhiteIndex(screenNumber);
     BLACK = BlackIndex(screenNumber);
-
+    
+    sw = Screen('Resolution', 0).width;
+    sh = Screen('Resolution', 0).height;
+    MARGEN = 100;
     % Open a double buffered (maybe fullscreen)
     if FULLSCREEN
         windowSize = [];
     else
-        windowSize = [100 100 1300 900];
+        % hace una ventana centrada que ocupa casi toda la pantalla (dejando MARGEN pixels arriba, abajo, izq y derecha)
+        windowSize = InsetRect([0 0 sw sh], MARGEN, MARGEN);
     end
 
     [windowHandle, wRect] = Screen('OpenWindow',screenNumber, 0, windowSize, 32, 2);
