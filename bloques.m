@@ -138,7 +138,7 @@ function InitPTB(fullscreen)
     if FULLSCREEN
         windowSize = [];
     else
-        windowSize = [100 100 900 900];
+        windowSize = [100 100 1300 900];
     end
 
     [windowHandle, wRect] = Screen('OpenWindow',screenNumber, 0, windowSize, 32, 2);
@@ -193,18 +193,18 @@ function pausaExplicaBloque(img, snd, seguir_img, practica)
     if practica
         if img && ~snd
             s_text = 'A continuación van a aparecer cuadrantes de diferentes colores. \n Debes apretar la barra espaciadora cada vez que veas el cuadrante amarillo';
-        end
+        end 
 
         if ~img && snd
-            s_text ='A continuación vas a escuchar grupos de 4 tonos separados entre si \n. Estos tonos se van a repetir varias veces. Presta atencion y apreta la barra espaciadora cada vez que escuches el tono diferente'
+            s_text ='A continuación vas a escuchar grupos de 4 tonos separados entre si. \n Estos tonos se van a repetir varias veces. Presta atencion y  \n  apreta la barra espaciadora cada vez que escuches el tono diferente'
         end
 
 
         if img && snd
             if seguir_img
-                s_seguir = ' el cuadrante amarillo';
+                s_seguir = ' el cuadrante amarillo. ';
             else
-                s_seguir = ' el sonido diferente ';
+                s_seguir = ' el sonido diferente. ';
             end
 
             s_text = strcat('Ahora van a aparecer tanto las imagenes como los tonos. \n Debes apretar la barra espaciadora cada vez que aparezca ', s_seguir);
