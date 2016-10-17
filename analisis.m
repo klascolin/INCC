@@ -13,7 +13,7 @@ total_trials = [];
 target_time = cell(1,1);
 time_firstPress = cell(1,1);
 time_lastPress = cell(1,1);
-f = fopen('data/bloques_delay_sin_signo.csv');
+f = fopen('data/bloques.csv');
 
 while 1    
     suj = fscanf(f, '%i,', [1 1]);
