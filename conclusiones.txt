@@ -14,6 +14,7 @@ Bimodales(delay+0 target snd/img:
 -Mejor cuando se debe seguir sonido. 
 -No se puede rechazar ningun test. No hay evidencia para decir que son de distintas distribucuines, de hecho (viendo los boxplots) sonido solo se asemaja "bastante" a target snd.
 -ranktest rechaza igual distribucion(p > 0.008)
+-Accuracy del 100%? Chequear?
 -test de permutacion rechaza gual distribucion(p > 0.0021)
 -Los test rechazan todo para target img
 -Se vuelve a notar una tendencia en la anticpacion con target snd
