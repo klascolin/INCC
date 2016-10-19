@@ -209,8 +209,18 @@ end
 %% cuentitas cuentitas
 mi=1;
 ms=1;
-mc0,mc1,mc2,mc3,mc4,mc5,mc6,mc7,mc8 = 1;
-mc9,mc10,mc11=1;
+mc0=1;
+mc1=1;
+mc2=1;
+mc3=1;
+mc4=1;
+mc5=1;
+mc6=1;
+mc7=1;
+mc8=1;
+mc9=1;
+mc10=1;
+mc11=1;
 mc12=1;
 mc13=1;
 deltas = cell(1,1);
@@ -660,18 +670,16 @@ end
 
 %Distribucion de las muestras(histograma normalizado)
 
-[f,x] = hist(deltas{1});
+[f,x] = hist(deltas{1},7);
 figure;
 bar(x,f/sum(f))
-
-
-
+hold on;
+line([mean(deltas{1}) mean(deltas{1})], [0  max(x)])
+hold off
 title('Solo Sonido')
 
-
-
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-%t = kstest(deltas{1})
+t = kstest(deltas{1})
 
 %Boxplot
 figure;
@@ -696,20 +704,23 @@ mean(m_accuracy{1})
 %Solo imagen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Distribucion de las muestras(histograma normalizado)
-[f,x] = hist(deltas{2});
+[f,x] = hist(deltas{2},7);
 figure;
 h = bar(x,f/sum(f))
+hold on;
+line([mean(deltas{2}) mean(deltas{2})], [0  max(x)])
+hold off
 %plot(f)
 title('Solo imagen')
 %Boxplot
 figure;
-bpdata = [deltas{2}, deltas{3}];
-bpgroup = [ones(size(deltas{2}))*1, ones(size(deltas{3}))*2]
+bpdata = [deltas{1},deltas{2}, deltas{3},deltas{10}];
+bpgroup = [ones(size(deltas{1}))*1,ones(size(deltas{2}))*2, ones(size(deltas{3}))*3,ones(size(deltas{10}))*4]
 boxplot(bpdata, bpgroup);
 title('Boxplot tiempos de respuesta solo imagen')
 
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-%h = kstest(deltas{2})
+t = kstest(deltas{2})
 
 %Medidas de centralidad
 disp('prom')
@@ -724,23 +735,26 @@ mean(m_accuracy{2})
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Combinado +0:
+%Combinado +0(target sound):
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Distribucion de las muestras(histograma normalizado)
 
-[f,x] = hist(deltas{3});
+[f,x] = hist(deltas{3},7);
 figure;
 bar(x,f/sum(f))
-title('Delay +0')
+hold on;
+line([mean(deltas{3}) mean(deltas{3})], [0  max(x)])
+hold off
+title('Delay +0 target sound')
 
 %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-%t = kstest(deltas{3})
+t = kstest(deltas{3})
 
 %Boxplot
 figure;
 boxplot(deltas{3})
-title('Boxplot tiempos de respuesta Delay +0')
+title('Boxplot tiempos de respuesta Delay +0 target soun')
 
 %Medidas de centralidad
 disp('prom')
@@ -752,6 +766,42 @@ var(deltas{3})
 
 %Medidas de precision en la tarea
 mean(m_accuracy{3})
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Combinado +0(target image):
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Distribucion de las muestras(histograma normalizado)
+
+[f,x] = hist(deltas{10},7);
+figure;
+bar(x,f/sum(f))
+hold on;
+line([mean(deltas{10}) mean(deltas{10})], [0  max(x)])
+hold off
+title('Delay +0 target image')
+
+%One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
+t = kstest(deltas{10})
+
+%Boxplot
+figure;
+boxplot(deltas{10})
+title('Boxplot tiempos de respuesta Delay +0 target image')
+
+%Medidas de centralidad
+disp('prom')
+mean(deltas{10})
+median(deltas{10})
+
+%Medidas de dispersion, estabilidad de la sincronia
+var(deltas{10})
+
+%Medidas de precision en la tarea
+mean(m_accuracy{10})
+
+
 % 
 % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % %Combinado +0.1:
@@ -945,40 +995,47 @@ disp('imagen vs sonido')
 [p,h] = ranksum(deltas{1},deltas{2})
 
 delta_h0 =  abs(mean(deltas{1}) - mean(deltas{2}))
-
 y = Permutation_Test(10000,deltas{1},deltas{2},delta_h0)
 
 
-disp('imagen vs delay+0')
+disp('imagen vs delay+0 target sound')
 [p,h] = ranksum(deltas{3},deltas{2})
 
 delta_h0 = abs(mean(deltas{3}) - mean(deltas{2}))
 y = Permutation_Test(10000,deltas{3},deltas{2},delta_h0)
 
-disp('delay0 vs sonido')
+disp('delay+0 target sound vs sonido')
 [p,h] = ranksum(deltas{3},deltas{1})
 
 delta_h0 = abs(mean(deltas{3}) - mean(deltas{1}))
 y = Permutation_Test(10000,deltas{3},deltas{1},delta_h0)
 
-disp('delay0(img) vs sonido')
+disp('delay0 target img vs sonido')
 [p,h] = ranksum(deltas{10},deltas{1})
 
 delta_h0 = abs(mean(deltas{10}) - mean(deltas{1}))
 y = Permutation_Test(10000,deltas{10},deltas{1},delta_h0)
 
-disp('delay0(img) vs sonido')
+disp('delay0 target img  vs sonido')
 [p,h] = ranksum(deltas{10},deltas{2})
 
 delta_h0 = abs(mean(deltas{10}) - mean(deltas{2}))
 y = Permutation_Test(10000,deltas{10},deltas{2},delta_h0)
-
 
 disp('delay0(img) vs delay0(snd)')
 [p,h] = ranksum(deltas{10},deltas{3})
 
 delta_h0 = abs(mean(deltas{10}) - mean(deltas{3}))
 y = Permutation_Test(10000,deltas{10},deltas{3},delta_h0)
+figure;
+
+y = [mean(deltas{1});mean(deltas{2});mean(deltas{3});mean(deltas{10})];
+err =  [std(deltas{1});std(deltas{2});std(deltas{3});std(deltas{10})]
+labels = {'A';'V';'AV(snd)';'AV(img)'}
+bar(y,0.5)
+set(gca,'xticklabel',labels)
+hold on;
+errorbar(y,err,'r.')
 
 
 
