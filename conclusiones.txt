@@ -1,0 +1,23 @@
+Conclusiones:
+
+Unimodales:
+-Notoria diferencia entre unimodales(gana sonido)
+-STD similares, pero demasiado grandes??
+-ranktest rechaza igual distribucion(p > 0.00014)
+-Accuracy del 100%
+-El test de normalidad se rechaza
+-El histograma muesta que existe una tendencia clara a anticiparse con el sonido
+-Respalda la idea de la dominacion de la modalidad mas precisa(temporal)
+
+Bimodales(delay+0 target snd/img:
+
+-Mejor cuando se debe seguir sonido. 
+-No se puede rechazar ningun test. No hay evidencia para decir que son de distintas distribucuines, de hecho (viendo los boxplots) sonido solo se asemaja "bastante" a target snd.
+-ranktest rechaza igual distribucion(p > 0.008)
+-test de permutacion rechaza gual distribucion(p > 0.0021)
+-Los test rechazan todo para target img
+-Se vuelve a notar una tendencia en la anticpacion con target snd
+-La influencia de la imagen como ruido en target snd no fue significativa, ya que se sigue pareciendo a la del audio en promedio. KsTest rechaza(no provienen de la misma distribucion)
+-La influencia del sonido en la imagen parece no ser suficiente
+
+
