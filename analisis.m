@@ -80,6 +80,49 @@ num_trials = j-1;
 
 clear sujeto tiempo practica delay img snd target bloque_del_sujeto total_trials target_time time_firstPress time_lastPress f b i j k s num_bloques suj
 
+%% arreglar los taps que cayeron en el bloque siguiente por error
+for t = 1 : (num_trials - 1)
+
+  a = t;
+  b = t+1;
+
+  if Trials(a).NumBloqueOriginal != Trials(b).NumBloqueOriginal
+    continue
+  end
+  
+  if Trials(a).PrimerTap ~= -1
+    continue
+  end
+  
+  if (Trials(b).Asincronia >= -1)
+    continue
+  end
+  
+  %% a y b son del mismo bloque, a no tiene ningun tap y b esta apuradisimo
+  %% muevo el primer tap de b como primer tap de a, y el ultimo de b como primero de b
+  
+  nuevo_a = Trials(b).PrimerTap;
+  
+  b_unico_tap = (Trials(b).PrimerTap == Trials(b).UltimoTap);
+  
+  if b_unico_tap
+    nuevo_b = -1;
+  else
+    nuevo_b = Trials(b).UltimoTap;
+  end
+  
+  Trials(a).PrimerTap = nuevo_a;
+  Trials(a).UltimoTap = nuevo_a;
+  
+  Trials(b).PrimerTap = nuevo_b;
+  Trials(b).UltimoTap = nuevo_b;
+  
+  %% recalculo asincronias
+  Trials(a).Asincronia = Trials(a).PrimerTap - Trials(a).TiempoObjetivo;
+  Trials(b).Asincronia = Trials(b).PrimerTap - Trials(b).TiempoObjetivo;
+end
+
+
 %% calcular muestras (promedio de cada bloque)
 Muestras = [];
 t = 1;
