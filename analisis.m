@@ -379,7 +379,7 @@ for s = 1:numel(sujs)
     if numel(delta_c0) > 0
         deltas{6}(mc3) = delta_c0(1);
         m_accuracy{6}(mc3) = accuracy(1);
-        mc3 = mc3 + 1;
+        mc3 = mc3 + 1
     end
     
     
@@ -514,7 +514,7 @@ for s = 1:numel(sujs)
 
 
     if numel(delta_c0) > 0
-        disp('hola0')
+        
         deltas{11}(mc8) = delta_c0(1);
         m_accuracy{11}(mc8) = accuracy(1);
         mc8 = mc8 + 1;
@@ -541,7 +541,6 @@ for s = 1:numel(sujs)
 
 
     if numel(delta_c0) > 0
-        disp('hola0')
         deltas{12}(mc9) = delta_c0(1);
         m_accuracy{12}(mc9) = accuracy(1);
         mc9 = mc9 + 1;
@@ -568,7 +567,7 @@ for s = 1:numel(sujs)
 
 
     if numel(delta_c0) > 0
-        disp('hola0')
+       
         deltas{13}(mc10) = delta_c0(1);
         m_accuracy{13}(mc10) = accuracy(1);
         mc10 = mc10 + 1;
@@ -595,7 +594,7 @@ for s = 1:numel(sujs)
 
 
     if numel(delta_c0) > 0
-        disp('hola0')
+      
         deltas{14}(mc11) = delta_c0(1);
         m_accuracy{14}(mc11) = accuracy(1);
         mc11 = mc11 + 1;
@@ -622,7 +621,7 @@ for s = 1:numel(sujs)
 
 
     if numel(delta_c0) > 0
-        disp('hola0')
+      
         deltas{15}(mc12) = delta_c0(1);
         m_accuracy{15}(mc12) = accuracy(1);
         mc12 = mc12 + 1;
@@ -649,7 +648,7 @@ for s = 1:numel(sujs)
 
 
     if numel(delta_c0) > 0
-        disp('hola0')
+       
         deltas{16}(mc13) = delta_c0(1);
         m_accuracy{16}(mc13) = accuracy(1);
         mc13 = mc13 + 1;
@@ -715,7 +714,7 @@ title('Solo imagen')
 %Boxplot
 figure;
 bpdata = [deltas{1},deltas{2}, deltas{3},deltas{10}];
-bpgroup = [ones(size(deltas{1}))*1,ones(size(deltas{2}))*2, ones(size(deltas{3}))*3,ones(size(deltas{10}))*4]
+bpgroup = [ones(size(deltas{1}))*1,ones(size(deltas{2}))*2, ones(size(deltas{3}))*3,ones(size(deltas{10}))*4];
 boxplot(bpdata, bpgroup);
 title('Boxplot tiempos de respuesta solo imagen')
 
@@ -1027,15 +1026,72 @@ disp('delay0(img) vs delay0(snd)')
 
 delta_h0 = abs(mean(deltas{10}) - mean(deltas{3}))
 y = Permutation_Test(10000,deltas{10},deltas{3},delta_h0)
-figure;
 
+%Comparacion de las medias de solo sonido, solo imagen, y sincronia
+figure;
 y = [mean(deltas{1});mean(deltas{2});mean(deltas{3});mean(deltas{10})];
-err =  [std(deltas{1});std(deltas{2});std(deltas{3});std(deltas{10})]
 labels = {'A';'V';'AV(snd)';'AV(img)'}
-bar(y,0.5)
+bar_h=bar(y,0.5)
 set(gca,'xticklabel',labels)
-hold on;
-errorbar(y,err,'r.')
+bar_child=get(bar_h,'Children');
+set(bar_child,'CData',y);
+title('Comparacion de las medias de solo sonido, solo imagen, y sincronia')
+
+figure;
+v =  [std(deltas{1});std(deltas{2});std(deltas{3});std(deltas{10})]
+labels = {'A';'V';'AV(snd)';'AV(img)'}
+bar_h = bar(v,0.5)
+set(gca,'xticklabel',labels)
+bar_child=get(bar_h,'Children');
+set(bar_child,'CData',v);
+title('Comparacion de los std de solo sonido, solo imagen, y sincronia')
+
+
+%Comparacion de las varianzas de solo sonido, solo imagen, y sincronia
+
+
+%Comparacion de las medias de target image
+figure;
+y = [mean(deltas{4});mean(deltas{5});mean(deltas{6});mean(deltas{15});mean(deltas{13});mean(deltas{11});mean(deltas{1});mean(deltas{2})];
+labels = {'+0.1';'+0.3';'+0.4';'-0.1';'-0.3';'-0.4';'SND';'IMG'}
+bar_h=bar(y,0.5)
+title('Comparacion medias asincronia target image')
+set(gca,'xticklabel',labels)
+bar_child=get(bar_h,'Children');
+set(bar_child,'CData',y);
+
+figure;
+v =  [std(deltas{4});std(deltas{5});std(deltas{6});std(deltas{15});std(deltas{13});std(deltas{11})]
+labels = {'+0.1';'+0.3';'+0.4';'-0.1';'-0.3';'-0.4'}
+bar_h = bar(v,0.5)
+set(gca,'xticklabel',labels)
+bar_child=get(bar_h,'Children');
+set(bar_child,'CData',v);
+title('Comparacion de std de asincronia target image')
+
+
+%Comparacion de las medias de target sound
+figure;
+y = [mean(deltas{9});mean(deltas{8});mean(deltas{7});mean(deltas{16});mean(deltas{14});mean(deltas{12});mean(deltas{1});mean(deltas{2})];
+labels = {'+0.1';'+0.3';'+0.4';'-0.1';'-0.3';'-0.4';'SND';'IMG'}
+bar_h=bar(y,0.5)
+title('Comparacion medias asincronia target sound')
+set(gca,'xticklabel',labels)
+bar_child=get(bar_h,'Children');
+set(bar_child,'CData',y);
+
+figure;
+v =  [std(deltas{9});std(deltas{8});std(deltas{7});std(deltas{16});std(deltas{14});std(deltas{12})]
+labels = {'+0.1';'+0.3';'+0.4';'-0.1';'-0.3';'-0.4'}
+bar_h = bar(v,0.5)
+set(gca,'xticklabel',labels)
+bar_child=get(bar_h,'Children');
+set(bar_child,'CData',v);
+title('Comparacion de std de asincronia target sound')
+
+
+[p,h] = ranksum(deltas{15},deltas{13})
+[p,h] = ranksum(deltas{13},deltas{11})
 
 
 
