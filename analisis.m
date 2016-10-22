@@ -80,6 +80,49 @@ num_trials = j-1;
 
 clear sujeto tiempo practica delay img snd target bloque_del_sujeto total_trials target_time time_firstPress time_lastPress f b i j k s num_bloques suj
 
+%% arreglar los taps que cayeron en el bloque siguiente por error
+for t = 1 : (num_trials - 1)
+
+  a = t;
+  b = t+1;
+
+  if Trials(a).NumBloqueOriginal ~= Trials(b).NumBloqueOriginal
+    continue
+  end
+  
+  if Trials(a).PrimerTap ~= -1
+    continue
+  end
+  
+  if (Trials(b).Asincronia >= -1)
+    continue
+  end
+  
+  %% a y b son del mismo bloque, a no tiene ningun tap y b esta apuradisimo
+  %% muevo el primer tap de b como primer tap de a, y el ultimo de b como primero de b
+  
+  nuevo_a = Trials(b).PrimerTap;
+  
+  b_unico_tap = (Trials(b).PrimerTap == Trials(b).UltimoTap);
+  
+  if b_unico_tap
+    nuevo_b = -1;
+  else
+    nuevo_b = Trials(b).UltimoTap;
+  end
+  
+  Trials(a).PrimerTap = nuevo_a;
+  Trials(a).UltimoTap = nuevo_a;
+  
+  Trials(b).PrimerTap = nuevo_b;
+  Trials(b).UltimoTap = nuevo_b;
+  
+  %% recalculo asincronias
+  Trials(a).Asincronia = Trials(a).PrimerTap - Trials(a).TiempoObjetivo;
+  Trials(b).Asincronia = Trials(b).PrimerTap - Trials(b).TiempoObjetivo;
+end
+
+
 %% calcular muestras (promedio de cada bloque)
 Muestras = [];
 t = 1;
@@ -101,7 +144,7 @@ while t <= (num_trials + 1)
             Muestras(m).HaySonido = Trials(t-1).HaySonido;
             Muestras(m).SeguirImagen = Trials(t-1).SeguirImagen;
             Muestras(m).Accuracy = 1 - (ignorados/(k+ignorados));
-
+            Muestras(m).t = tiempos;
             
             Muestras(m).Tiempo = Trials(t-1).Tiempo;
             Muestras(m).TiempoObjetivo = Trials(t-1).TiempoObjetivo;
@@ -131,6 +174,7 @@ while t <= (num_trials + 1)
     if ignorados == 0
         asinc = asinc + Trials(t).Asincronia;
         k = k + 1;
+        tiempos(k) = Trials(t).Asincronia;
     end
         
     unbo = Trials(t).NumBloqueOriginal;
@@ -228,6 +272,7 @@ deltas_img = [];
 deltas_snd = [];
 deltas_combinados_0 = [];
 m_accuracy = cell(1,1);
+tiempos = []
 
 
 sujs = unique([Muestras.Sujeto]);
@@ -242,7 +287,7 @@ for s = 1:numel(sujs)
         [Muestras.HaySonido] == 1 ...
     ).AsinMedia];
     
-
+   
     accuracy = [Muestras( ...
         [Muestras.Sujeto] == suj & ...
         [Muestras.EsDePractica] == 0 & ...
@@ -296,7 +341,6 @@ for s = 1:numel(sujs)
         [Muestras.Delay] == 0 & ...
         [Muestras.SeguirImagen] == 0 ... 
     ).Accuracy];
-
 
     if numel(delta_c0) > 0
         deltas{3}(mc0) = delta_c0(1);
@@ -661,329 +705,105 @@ for s = 1:numel(sujs)
         % title(['Sujeto ', num2str(suj)]);
     end
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Analisis de datos
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Solo Sonido:
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Distribucion de las muestras(histograma normalizado)
-
-[f,x] = hist(deltas{1},7);
-figure;
-bar(x,f/sum(f))
-hold on;
-line([mean(deltas{1}) mean(deltas{1})], [0  max(x)])
-hold off
-title('Solo Sonido')
-
-%One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-t = kstest(deltas{1})
-
-%Boxplot
-figure;
-boxplot(deltas{1})
-title('Boxplot tiempos de respuesta solo sonido')
-
-%Medidas de centralidad
-disp('promedio')
-mean(deltas{1})
-disp('mediana')
-median(deltas{1})
-
-%Medidas de dispersion, estabilidad de la sincronia
-disp('varianza')
-var(deltas{1})
-
-%Medidas de precision en la tarea
-disp('accuracy')
-mean(m_accuracy{1})
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Solo imagen
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Distribucion de las muestras(histograma normalizado)
-[f,x] = hist(deltas{2},7);
-figure;
-h = bar(x,f/sum(f))
-hold on;
-line([mean(deltas{2}) mean(deltas{2})], [0  max(x)])
-hold off
-%plot(f)
-title('Solo imagen')
-%Boxplot
-figure;
-bpdata = [deltas{1},deltas{2}, deltas{3},deltas{10}];
-bpgroup = [ones(size(deltas{1}))*1,ones(size(deltas{2}))*2, ones(size(deltas{3}))*3,ones(size(deltas{10}))*4];
-boxplot(bpdata, bpgroup);
-title('Boxplot tiempos de respuesta solo imagen')
-
-%One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-t = kstest(deltas{2})
-
-%Medidas de centralidad
-disp('prom')
-mean(deltas{2})
-median(deltas{2})
-
-%Medidas de dispersion, estabilidad de la sincronia
-var(deltas{2})
-
-%Medidas de precision en la tarea
-mean(m_accuracy{2})
+tit = cell(1,1);
+tit{1} = 'Sound';
+tit{2} = 'Image';
+tit{3} = 'AV(target sound)';
+tit{4} = 'AV(target image) +0.1';
+tit{5} = 'AV(target image) +0.3';
+tit{6} = 'AV(target image) +0.4';
+tit{7} = 'AV(target sound) -0.4';
+tit{8} = 'AV(target sound) -0.3';
+tit{9} = 'AV(target sound) -0.1';
+tit{10} = 'AV(target image)';
+tit{11} = 'AV(target image) -0.4';
+tit{12} = 'AV(target sound) +0.4';
+tit{13} = 'AV(target image) -0.3';
+tit{14} = 'AV(target sound) +0.3';
+tit{15} = 'AV(target image) -0.1';  
+tit{16} = 'AV(target sound) +0.1';
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Combinado +0(target sound):
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+for i=1:16
+    disp(tit{i})
+    %Distribucion de las muestras(histograma normalizado)
 
-%Distribucion de las muestras(histograma normalizado)
+    [f,x] = hist(deltas{i},7);
+    figure;
+    bar(x,f/sum(f))
+    hold on;
+    line([mean(deltas{i}) mean(deltas{i})], [0  max(x)])
+    hold off
+    title(tit{i})
+    
+    %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
+    disp('Kolmogorov normality test')
+    t = kstest(deltas{i})
 
-[f,x] = hist(deltas{3},7);
-figure;
-bar(x,f/sum(f))
-hold on;
-line([mean(deltas{3}) mean(deltas{3})], [0  max(x)])
-hold off
-title('Delay +0 target sound')
+    %Boxplot
+    figure;
+    boxplot(deltas{i})
+    title('Boxplot tiempos de respuesta Delay +0 target image')
 
-%One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-t = kstest(deltas{3})
+    %Medidas de centralidad
+    disp('prom')
+    mean(deltas{i})
+    disp('mediana')
+    median(deltas{i})
 
-%Boxplot
-figure;
-boxplot(deltas{3})
-title('Boxplot tiempos de respuesta Delay +0 target soun')
+    %Medidas de dispersion, estabilidad de la sincronia
+    disp('varianza')
+    var(deltas{i})
 
-%Medidas de centralidad
-disp('prom')
-mean(deltas{3})
-median(deltas{3})
+    %Medidas de precision en la tarea
+    disp('accuracy')
+    mean(m_accuracy{i})
 
-%Medidas de dispersion, estabilidad de la sincronia
-var(deltas{3})
-
-%Medidas de precision en la tarea
-mean(m_accuracy{3})
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Combinado +0(target image):
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%Distribucion de las muestras(histograma normalizado)
-
-[f,x] = hist(deltas{10},7);
-figure;
-bar(x,f/sum(f))
-hold on;
-line([mean(deltas{10}) mean(deltas{10})], [0  max(x)])
-hold off
-title('Delay +0 target image')
-
-%One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-t = kstest(deltas{10})
-
-%Boxplot
-figure;
-boxplot(deltas{10})
-title('Boxplot tiempos de respuesta Delay +0 target image')
-
-%Medidas de centralidad
-disp('prom')
-mean(deltas{10})
-median(deltas{10})
-
-%Medidas de dispersion, estabilidad de la sincronia
-var(deltas{10})
-
-%Medidas de precision en la tarea
-mean(m_accuracy{10})
+end
 
 
+%Inspeccion de la evolucion de los sujetos
+% tiempos = cell(1,1);
+% for s = 1:numel(sujs)
+%     suj = sujs(s);
+%     i = 1;
+%     t =  [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == 0 & ...
+%         [Muestras.SeguirImagen] == 0 ... 
+%     ).t];
+% figure;
+%     h=plot(t,'bo-');
+%     title('Trials target sound delay +0');
+%     set(h,'linewidth',2);
+%    
+% end
 % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %Combinado +0.1:
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % 
-% % %Distribucion de las muestras(histograma normalizado)
-% % 
-% % [f,x] = hist(deltas{4});
-% % figure;
-% % bar(x,f/sum(f))
-% % title('Delay + 0.1 target image')
-% % %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-% % %t = kstest(deltas{4})
-% % 
-% % %Boxplot
-% % figure;
-% % boxplot(deltas{4})
-% % title('Boxplot tiempos de respuesta Delay +0.1 target image')
-% % 
-% % %Medidas de centralidad
-% % disp('prom')
-% % mean(deltas{4})
-% % median(deltas{4})
-% % 
-% % %Medidas de dispersion, estabilidad de la sincronia
-% % var(deltas{4})
-% % 
-% % %Medidas de precision en la tarea
-% % mean(m_accuracy{4})
-% % 
-% % 
-% % 
-% % %Analisis de datos
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %Combinado +0.3:
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % 
-% % %Distribucion de las muestras(histograma normalizado)
-% % 
-% % [f,x] = hist(deltas{5});
-% % figure;
-% % bar(x,f/sum(f))
-% % title('Delay + 0.3 target image')
-% % %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-% % %t = kstest(deltas{5})
-% % 
-% % %Boxplot
-% % figure;
-% % boxplot(deltas{5})
-% % title('Boxplot tiempos de respuesta Delay 0+.3 target image')
-% % 
-% % %Medidas de centralidad
-% % disp('prom')
-% % mean(deltas{5})
-% % median(deltas{5})
-% % 
-% % %Medidas de dispersion, estabilidad de la sincronia
-% % var(deltas{5})
-% % 
-% % %Medidas de precision en la tarea
-% % mean(m_accuracy{5})
-% % 
-% % 
-% % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %Combinado +0.4:
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % 
-% % %Distribucion de las muestras(histograma normalizado)
-% % 
-% % [f,x] = hist(deltas{6});
-% % figure;
-% % bar(x,f/sum(f))
-% % title('Delay + 0.4 target image')
-% % %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-% % t = kstest(deltas{6})
-% % 
-% % %Boxplot
-% % figure;
-% % boxplot(deltas{6})
-% % title('Boxplot tiempos de respuesta Delay +0.4 target image')
-% % 
-% % %Medidas de centralidad
-% % disp('prom')
-% % mean(deltas{6})
-% % median(deltas{6})
-% % 
-% % %Medidas de dispersion, estabilidad de la sincronia
-% % var(deltas{6})
-% % 
-% % %Medidas de precision en la tarea
-% % mean(m_accuracy{6})
-% % 
-% % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %Combinado +0.4 target sound:    
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % 
-% % %Distribucion de las muestras(histograma normalizado)
-% % 
-% % [f,x] = hist(deltas{7});
-% % figure;
-% % bar(x,f/sum(f))
-% % title('Delay + 0.4 target sound')
-% % %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-% % t = kstest(deltas{7})
-% % 
-% % %Boxplot
-% % figure;
-% % boxplot(deltas{7})
-% % title('Boxplot tiempos de respuesta Delay +0.4 target sound')
-% % 
-% % %Medidas de centralidad
-% % disp('prom')
-% % mean(deltas{7})
-% % median(deltas{7})
-% % 
-% % %Medidas de dispersion, estabilidad de la sincronia
-% % var(deltas{7})
-% % 
-% % %Medidas de precision en la tarea
-% % mean(m_accuracy{7})
-% % 
-% % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %Combinado +0.3 target sound:
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % 
-% % %Distribucion de las muestras(histograma normalizado)
-% % 
-% % [f,x] = hist(deltas{8});
-% % figure;
-% % bar(x,f/sum(f))
-% % title('Delay + 0.3 target sound')
-% % 
-% % %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-% % t = kstest(deltas{8})
-% % 
-% % %Boxplot
-% % figure;
-% % boxplot(deltas{8})
-% % title('Boxplot tiempos de respuesta Delay +0.3 target sound')
-% % 
-% % %Medidas de centralidad
-% % disp('prom')
-% % mean(deltas{8})
-% % median(deltas{8})
-% % 
-% % %Medidas de dispersion, estabilidad de la sincronia
-% % var(deltas{8})
-% % 
-% % %Medidas de precision en la tarea
-% % mean(m_accuracy{8})
-% % 
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % %Combinado +0.1 target sound:
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % 
-% % %Distribucion de las muestras(histograma normalizado)
-% % 
-% % [f,x] = hist(deltas{9});
-% % figure;
-% % bar(x,f/sum(f))
-% % title('Delay + 0.1 target sound')
-% % 
-% % %One-sample Kolmogorov-Smirnov test, para ver normalidad en la muestra
-% % t = kstest(deltas{9})
-% % 
-% % %Boxplot
-% % figure;
-% % boxplot(deltas{9})
-% % title('Boxplot tiempos de respuesta Delay +0.1 target sonido')
-% % 
-% % %Medidas de centralidad
-% % disp('prom')
-% % mean(deltas{9})
-% % median(deltas{9})
-% % 
-% % %Medidas de dispersion, estabilidad de la sincronia
-% % var(deltas{9})
-% % 
-% % %Medidas de precision en la tarea
-% % mean(m_accuracy{9})
+% tiempos = cell(1,1);
+% for s = 1:numel(sujs)
+%     suj = sujs(s);
+%     i = 1;
+%     t =  [Muestras( ...
+%         [Muestras.Sujeto] == suj & ...
+%         [Muestras.EsDePractica] == 0 & ...
+%         [Muestras.HayImagen] == 1 & ...
+%         [Muestras.HaySonido] == 1 & ...
+%         [Muestras.Delay] == 0 & ...
+%         [Muestras.SeguirImagen] == 1 ... 
+%     ).t];
+% figure;
+%     h=plot(t,'go-');
+%     title('Trials target image delay +0');
+%     set(h,'linewidth',2);
+%    
+% end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1027,6 +847,45 @@ disp('delay0(img) vs delay0(snd)')
 delta_h0 = abs(mean(deltas{10}) - mean(deltas{3}))
 y = Permutation_Test(10000,deltas{10},deltas{3},delta_h0)
 
+disp('+0.1 +0.3 +0.4 target image')
+x = [deltas{4};deltas{5};deltas{6}]
+p = kruskalwallis(transpose(x))
+
+disp('-0.1 -0.3 -0.4 target image')
+x = [deltas{15};deltas{13};deltas{11}]
+p = kruskalwallis(transpose(x))
+
+disp('-0.1 -0.3 -0.4 target sound')
+x = [deltas{9};deltas{8};deltas{7}]
+p = kruskalwallis(transpose(x))
+
+
+disp('+0.1 +0.3 +0.4 target sound')
+x = [deltas{16};deltas{14};deltas{12}]
+p = kruskalwallis(transpose(x))
+
+
+disp('+0.1 target image vs +0.1 target sound')
+[p,h] = ranksum(deltas{4},deltas{16})
+
+delta_h0 = abs(mean(deltas{4}) - mean(deltas{16}))
+y = Permutation_Test(10000,deltas{4},deltas{16},delta_h0)
+
+
+disp('+0.3 target image vs +0.3 target sound')
+[p,h] = ranksum(deltas{5},deltas{16})
+
+delta_h0 = abs(mean(deltas{5}) - mean(deltas{14}))
+y = Permutation_Test(10000,deltas{5},deltas{14},delta_h0)
+
+
+disp('+0.4 target image vs +0.4 target sound')
+[p,h] = ranksum(deltas{6},deltas{12})
+
+delta_h0 = abs(mean(deltas{6}) - mean(deltas{12}))
+y = Permutation_Test(10000,deltas{6},deltas{12},delta_h0)
+
+
 %Comparacion de las medias de solo sonido, solo imagen, y sincronia
 figure;
 y = [mean(deltas{1});mean(deltas{2});mean(deltas{3});mean(deltas{10})];
@@ -1036,6 +895,7 @@ set(gca,'xticklabel',labels)
 bar_child=get(bar_h,'Children');
 set(bar_child,'CData',y);
 title('Comparacion de las medias de solo sonido, solo imagen, y sincronia')
+
 
 figure;
 v =  [std(deltas{1});std(deltas{2});std(deltas{3});std(deltas{10})]
@@ -1047,7 +907,6 @@ set(bar_child,'CData',v);
 title('Comparacion de los std de solo sonido, solo imagen, y sincronia')
 
 
-%Comparacion de las varianzas de solo sonido, solo imagen, y sincronia
 
 
 %Comparacion de las medias de target image
@@ -1073,7 +932,7 @@ title('Comparacion de std de asincronia target image')
 %Comparacion de las medias de target sound
 figure;
 y = [mean(deltas{9});mean(deltas{8});mean(deltas{7});mean(deltas{16});mean(deltas{14});mean(deltas{12});mean(deltas{1});mean(deltas{2})];
-labels = {'+0.1';'+0.3';'+0.4';'-0.1';'-0.3';'-0.4';'SND';'IMG'}
+labels = {'-0.1';'-0.3';'-0.4';'+0.1';'+0.3';'+0.4';'SND';'IMG'}
 bar_h=bar(y,0.5)
 title('Comparacion medias asincronia target sound')
 set(gca,'xticklabel',labels)
@@ -1082,13 +941,12 @@ set(bar_child,'CData',y);
 
 figure;
 v =  [std(deltas{9});std(deltas{8});std(deltas{7});std(deltas{16});std(deltas{14});std(deltas{12})]
-labels = {'+0.1';'+0.3';'+0.4';'-0.1';'-0.3';'-0.4'}
+labels = {'-0.1';'-0.3';'-0.4';'+0.1';'+0.3';'+0.4'}
 bar_h = bar(v,0.5)
 set(gca,'xticklabel',labels)
 bar_child=get(bar_h,'Children');
 set(bar_child,'CData',v);
 title('Comparacion de std de asincronia target sound')
-
 
 [p,h] = ranksum(deltas{15},deltas{13})
 [p,h] = ranksum(deltas{13},deltas{11})
