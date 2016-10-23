@@ -128,6 +128,8 @@ Muestras = [];
 t = 1;
 m = 1;
 k = 0;
+asincs_bloque = [];
+
 asinc = 0;
 unbo = Trials(1).NumBloqueOriginal;
 while t <= (num_trials + 1)
@@ -136,6 +138,7 @@ while t <= (num_trials + 1)
 
         if k ~=0 
             
+            Muestras(m).StdBloque = std(asincs_bloque);
             Muestras(m).AsinMedia = asinc / k;
             Muestras(m).Sujeto = Trials(t-1).Sujeto;
             Muestras(m).EsDePractica = Trials(t-1).EsDePractica;
@@ -152,6 +155,7 @@ while t <= (num_trials + 1)
             m = m + 1;
         end
         
+        asincs_bloque = [];
         k = 0;
         asinc = 0;
         if (t == (num_trials + 1))
@@ -173,6 +177,7 @@ while t <= (num_trials + 1)
     
     if ignorados == 0
         asinc = asinc + Trials(t).Asincronia;
+        asincs_bloque = [asincs_bloque, Trials(t).Asincronia];
         k = k + 1;
         tiempos(k) = Trials(t).Asincronia;
     end
