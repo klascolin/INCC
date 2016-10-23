@@ -959,9 +959,24 @@ title('Comparacion de std de asincronia target sound')
 
 
 
+%%%% grafico 2.0 (?) con StdBloque
 
+delays = [-0.1, -0.3, -0.4, 0.1, 0.3, 0.4];
+v = [];
+for i = 1 : 6
+  v(i) = mean([Muestras( ...
+      [Muestras.EsDePractica] == 0 & ...
+      [Muestras.HayImagen] == 1 & ...
+      [Muestras.HaySonido] == 1 & ...
+      [Muestras.SeguirImagen] == 0 & ...
+      [Muestras.Delay] == delays(i) ...
+  ).StdBloque]);
+end
 
-
-
-
-
+figure;
+labels = {'-0.1';'-0.3';'-0.4';'+0.1';'+0.3';'+0.4'}
+bar_h = bar(v,0.5)
+set(gca,'xticklabel',labels)
+bar_child=get(bar_h,'Children');
+set(bar_child,'CData',v);
+title('Comparacion 2.0 de std de asincronia target sound')
